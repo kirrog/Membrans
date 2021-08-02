@@ -1,14 +1,6 @@
-# os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 import tensorflow as tf
 import time
-from tensorflow import keras
-from tensorflow.keras.models import *
-from tensorflow.keras.layers import *
-from tensorflow.keras.optimizers import *
-from tensorflow.keras.callbacks import ModelCheckpoint, LearningRateScheduler
-from tensorflow.keras import backend as keras
 from datetime import datetime
-from src.clearer.clearer_model import clearer_model_new
 from src.clearer.datasets_loader import load_clearer_dataset
 
 def train_clearer_model(model):
@@ -23,10 +15,8 @@ def train_clearer_model(model):
 
     predictors, answers = load_clearer_dataset()
 
-    batch_size = 7
+    batch_size = 6
     epochs = 500
-
-    model.summary(line_length=120)
 
     model.compile(loss='binary_crossentropy',
                   optimizer='adam',
