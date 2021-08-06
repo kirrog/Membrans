@@ -1,10 +1,4 @@
-from src.clearer.clearer_model import load_model
-from src.utils.load_test_dataset import load_clearer_teset_set
-import matplotlib.pyplot as plt
 
-model = load_model()
-data = load_clearer_teset_set()
-results = model.predict(data)
+from src.clearer.datasets_loader import make_clearer_dataset
 
-im1 = results[0,...,0]
-plt.imshow((im1)>0.6)
+make_clearer_dataset()

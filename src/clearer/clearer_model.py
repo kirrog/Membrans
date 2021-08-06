@@ -5,10 +5,9 @@ from tensorflow.keras.models import *
 model_path = '..\\models\\clearer\\clearer_weights.h5'
 
 
-def clearer_model_new(size=[512, 512]):
+def clearer_model_new(size=[512, 512], n_filt = 64):
     activation = 'relu'
     padding = 'same'
-    n_filt = 32
     noise = 0.3
     p_drop = 0.4
     kernel_initializer = 'he_normal'

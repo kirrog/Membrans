@@ -7,6 +7,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 dataset_path = '\\..\\dataset\\easy_cases'
+test_dataset_path = '\\..\\dataset\\hard_cases'
+predict_path = '..\\dataset\\numpys\\predictors.npy'
+answers_path = '..\\dataset\\numpys\\answers.npy'
+tests_path = '..\\dataset\\numpys\\test.npy'
 img_x, img_y = 512, 512
 
 
@@ -20,7 +24,31 @@ def rgb2green(image):
                 res[i][j] = 0
     return res
 
-def load_clearer_dataset():
+def save_clearer_dataset_tests(numpy_table):
+    save_clearer_dataset_to_numpy_table(numpy_table, tests_path)
+
+def save_clearer_dataset_answers(numpy_table):
+    save_clearer_dataset_to_numpy_table(numpy_table, answers_path)
+
+def save_clearer_dataset_predicts(numpy_table):
+    save_clearer_dataset_to_numpy_table(numpy_table, predict_path)
+
+def save_clearer_dataset_to_numpy_table(numpy_table, file_path):
+    np.save(file_path, numpy_table)
+
+def load_clearer_dataset_tests():
+    return load_clearer_dataset_to_numpy_table(tests_path)
+
+def load_clearer_dataset_answers():
+    return load_clearer_dataset_to_numpy_table(answers_path)
+
+def load_clearer_dataset_predicts():
+    return load_clearer_dataset_to_numpy_table(predict_path)
+
+def load_clearer_dataset_to_numpy_table(file_path):
+    return np.load(file_path)
+
+def load_clearer_dataset_from_images():
     cwd = os.getcwd()
     dataFold = cwd + dataset_path
     paths_predicts = natsorted(glob.glob(dataFold + '\\*\\*_image\\*.png'))
@@ -37,20 +65,34 @@ def load_clearer_dataset():
         predictor = cv2.cvtColor(cv2.imread(path_predictor),cv2.COLOR_RGB2GRAY)
         answer = rgb2green(plt.imread(path_answer))
 
-        if len(predictor.shape) > 2:
-            set_predictors[i, ..., 0] = np.copy(predictor[..., 0])
-        else:
-            set_predictors[i, ..., 0] = np.copy(predictor)
-
+        set_predictors[i, ..., 0] = np.copy(predictor)
         set_predictors[i, ..., 0] /= 255
         set_answers[i, ..., 0] = answer[..., 0]
         sys.stdout.write("\rImage %i loaded" % i)
 
     return set_predictors, set_answers
 
-def add_augmentated_image(predict, answ, collection_predict, collection_answer):
-    print('add_augmentated_image')
+def make_clearer_dataset():
+    pred, answ = load_clearer_dataset_from_images()
+    save_clearer_dataset_predicts(pred)
+    save_clearer_dataset_answers(answ)
 
+def load_test_dataset_from_images():
+    cwd = os.getcwd()
+    dataFold = cwd + test_dataset_path
+    paths_predicts = natsorted(glob.glob(dataFold + '\\*\\*.png'))
 
-def augmentate_image(image):
-    print('augmentate_image')
+    set_predictors = np.zeros((len(paths_predicts), img_x, img_y, 1), dtype=np.float32)
+
+    for path_predictor, i in zip(paths_predicts, range(len(paths_predicts))):
+        predictor = cv2.cvtColor(cv2.imread(path_predictor), cv2.COLOR_RGB2GRAY)
+        predictor = cv2.resize(predictor, (512, 512), interpolation=cv2.INTER_CUBIC)
+        set_predictors[i, ..., 0] = np.copy(predictor)
+        set_predictors[i, ..., 0] /= 255
+        sys.stdout.write("\rImage %i loaded" % i)
+
+    return set_predictors
+
+def make_test_dataset():
+    pred = load_test_dataset_from_images()
+    save_clearer_dataset_tests(pred)
