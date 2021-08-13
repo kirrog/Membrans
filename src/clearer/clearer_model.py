@@ -1,85 +1,161 @@
 from tensorflow import keras
 from tensorflow.keras.layers import *
 from tensorflow.keras.models import *
+import tensorflow as tf
+
+#model_path = '/content/drive/MyDrive/Membrans/models/clearer/clearer_weights.h5'
 
 model_path = '..\\models\\clearer\\clearer_weights.h5'
 
+activation = 'relu'
+padding = 'same'
+n_filt = 64
+noise = 0.3
+p_drop = 0.4
+kernel_initializer = 'he_normal'
+channels = 3
+pool_size = (2, 2)
+deep = 5
 
-def clearer_model_new(size=[512, 512], n_filt = 64):
-    activation = 'relu'
-    padding = 'same'
-    noise = 0.3
-    p_drop = 0.4
-    kernel_initializer = 'he_normal'
-    channels = 3
-    pool_size = (2, 2)
+ker_reg = tf.keras.regularizers.L1(0.01)
+act_reg = tf.keras.regularizers.L2(0.01)
+
+def clearer_model_new(size=[512, 512]):
 
     img_rows, img_cols = size[0], size[1]
     input_shape = (img_rows, img_cols, 1)
 
     inputs = Input(input_shape)
-    inp_noise = GaussianNoise(noise)(inputs)
+    x = GaussianNoise(noise)(inputs)
 
-    conv1 = Conv2D(n_filt, 3, activation=activation, padding=padding, kernel_initializer=kernel_initializer)(inp_noise)
-    conv1 = Conv2D(n_filt, 3, activation=activation, padding=padding, kernel_initializer=kernel_initializer)(conv1)
-    batch1 = BatchNormalization(axis=channels)(conv1)
-    pool1 = MaxPooling2D(pool_size=pool_size)(batch1)
-    drop1 = Dropout(p_drop)(pool1)
+    cross_data = []
 
-    conv2 = Conv2D(n_filt * 2, 3, activation=activation, padding=padding, kernel_initializer=kernel_initializer)(drop1)
-    conv2 = Conv2D(n_filt * 2, 3, activation=activation, padding=padding, kernel_initializer=kernel_initializer)(conv2)
-    batch2 = BatchNormalization(axis=channels)(conv2)
-    pool2 = MaxPooling2D(pool_size=pool_size)(batch2)
-    drop2 = Dropout(p_drop)(pool2)
+    for i in range(deep - 1):
+        x = Conv2D(n_filt * (pow(2, i)), 3, activation=activation, padding=padding,
+                   kernel_initializer=kernel_initializer)(x)
+        x = Conv2D(n_filt * (pow(2, i)), 3, activation=activation, padding=padding,
+                   kernel_initializer=kernel_initializer)(x)
+        x = BatchNormalization(axis=channels)(x)
+        cross_data.append(x)
+        x = MaxPooling2D(pool_size=pool_size)(x)
+        x = Dropout(p_drop)(x)
 
-    conv3 = Conv2D(n_filt * 4, 3, activation=activation, padding=padding, kernel_initializer=kernel_initializer)(drop2)
-    conv3 = Conv2D(n_filt * 4, 3, activation=activation, padding=padding, kernel_initializer=kernel_initializer)(conv3)
-    batch3 = BatchNormalization(axis=channels)(conv3)
-    pool3 = MaxPooling2D(pool_size=pool_size)(batch3)
-    drop3 = Dropout(p_drop)(pool3)
+    x = Conv2D(n_filt * 16, 1, activation=activation, padding=padding,
+               kernel_initializer=kernel_initializer)(x)
+    x = Conv2D(n_filt * 16, 1, activation=activation, padding=padding,
+               kernel_initializer=kernel_initializer)(x)
+    x = Dropout(p_drop)(x)
 
-    conv4 = Conv2D(n_filt * 8, 3, activation=activation, padding=padding, kernel_initializer=kernel_initializer)(drop3)
-    conv4 = Conv2D(n_filt * 8, 3, activation=activation, padding=padding, kernel_initializer=kernel_initializer)(conv4)
-    batch4 = BatchNormalization(axis=channels)(conv4)
-    pool4 = MaxPooling2D(pool_size=pool_size)(batch4)
-    drop4 = Dropout(p_drop)(pool4)
+    for i in range(deep - 1):
+        x = UpSampling2D(size=pool_size)(x)
+        x = Conv2D(n_filt * (pow(2, deep - 2 - i)), 2, activation=activation, padding=padding,
+                   kernel_initializer=kernel_initializer)(x)
+        merge = concatenate([cross_data.pop(), x], axis=channels)
+        x = Conv2D(n_filt * (pow(2, deep - 2 - i)), 3, activation=activation, padding=padding,
+                   kernel_initializer=kernel_initializer)(merge)
+        x = Conv2D(n_filt * (pow(2, deep - 2 - i)), 3, activation=activation, padding=padding,
+                   kernel_initializer=kernel_initializer)(x)
+        if (i == deep - 2):
+            x = Conv2D(2, 3, activation=activation, padding=padding,
+                       kernel_initializer=kernel_initializer)(x)
+        x = BatchNormalization(axis=channels)(x)
 
-    conv5 = Conv2D(n_filt * 16, 1, activation=activation, padding=padding, kernel_initializer=kernel_initializer)(drop4)
-    conv5 = Conv2D(n_filt * 16, 1, activation=activation, padding=padding, kernel_initializer=kernel_initializer)(conv5)
-    drop5 = Dropout(p_drop)(conv5)
+    x = Conv2D(1, 1, activation='sigmoid')(x)
+    model = Model(inputs=inputs, outputs=x)
+    model.summary()
+    return model
 
-    up6 = UpSampling2D(size=pool_size)(drop5)
-    up6 = Conv2D(n_filt * 8, 2, activation=activation, padding=padding, kernel_initializer=kernel_initializer)(up6)
-    merge6 = concatenate([batch4, up6], axis=channels)
-    conv6 = Conv2D(n_filt * 8, 3, activation=activation, padding=padding, kernel_initializer=kernel_initializer)(merge6)
-    conv6 = Conv2D(n_filt * 8, 3, activation=activation, padding=padding, kernel_initializer=kernel_initializer)(conv6)
-    batch6 = BatchNormalization(axis=channels)(conv6)
 
-    up7 = UpSampling2D(size=pool_size)(batch6)
-    up7 = Conv2D(n_filt * 4, 2, activation=activation, padding=padding, kernel_initializer=kernel_initializer)(up7)
-    merge7 = concatenate([batch3, up7], axis=channels)
-    conv7 = Conv2D(n_filt * 4, 3, activation=activation, padding=padding, kernel_initializer=kernel_initializer)(merge7)
-    conv7 = Conv2D(n_filt * 4, 3, activation=activation, padding=padding, kernel_initializer=kernel_initializer)(conv7)
-    batch7 = BatchNormalization(axis=channels)(conv7)
+def clearer_model_new_resul(size=[512, 512]):
+    n_filt = 40
 
-    up8 = UpSampling2D(size=pool_size)(batch7)
-    up8 = Conv2D(n_filt * 2, 2, activation=activation, padding=padding, kernel_initializer=kernel_initializer)(up8)
-    merge8 = concatenate([batch2, up8], axis=channels)
+    img_rows, img_cols = size[0], size[1]
+    input_shape = (img_rows, img_cols, 1)
 
-    conv8 = Conv2D(n_filt * 2, 3, activation=activation, padding=padding, kernel_initializer=kernel_initializer)(merge8)
-    conv8 = Conv2D(n_filt * 2, 3, activation=activation, padding=padding, kernel_initializer=kernel_initializer)(conv8)
-    batch8 = BatchNormalization(axis=channels)(conv8)
+    inputs = Input(input_shape)
+    x = GaussianNoise(noise)(inputs)
 
-    up9 = UpSampling2D(size=pool_size)(batch8)
-    up9 = Conv2D(n_filt, 2, activation=activation, padding=padding, kernel_initializer=kernel_initializer)(up9)
-    merge9 = concatenate([batch1, up9], axis=channels)
-    conv9 = Conv2D(n_filt, 3, activation=activation, padding=padding, kernel_initializer=kernel_initializer)(merge9)
-    conv9 = Conv2D(n_filt, 3, activation=activation, padding=padding, kernel_initializer=kernel_initializer)(conv9)
-    conv9 = Conv2D(2, 3, activation=activation, padding=padding, kernel_initializer=kernel_initializer)(conv9)
-    batch9 = BatchNormalization(axis=channels)(conv9)
+    cross_data = []
 
-    conv10 = Conv2D(1, 1, activation='sigmoid')(batch9)
-    return Model(inputs=inputs, outputs=conv10)
+    for i in range(deep - 1):
+        x = Conv2D(n_filt * (pow(2, i)), 3, activation=activation, padding=padding,
+                   kernel_initializer=kernel_initializer, activity_regularizer=act_reg)(x)
+        x = Conv2D(n_filt * (pow(2, i)), 3, activation=activation, padding=padding,
+                   kernel_initializer=kernel_initializer, activity_regularizer=act_reg)(x)
+        x = BatchNormalization(axis=channels, activity_regularizer=act_reg)(x)
+        cross_data.append(x)
+        x = MaxPooling2D(pool_size=pool_size)(x)
+        x = Dropout(p_drop)(x)
+
+    x = Conv2D(n_filt * 16, 1, activation=activation, padding=padding,
+               kernel_initializer=kernel_initializer, activity_regularizer=act_reg)(x)
+    x = Conv2D(n_filt * 16, 1, activation=activation, padding=padding,
+               kernel_initializer=kernel_initializer, activity_regularizer=act_reg)(x)
+    x = Dropout(p_drop)(x)
+
+    for i in range(deep - 1):
+        x = UpSampling2D(size=pool_size)(x)
+        x = Conv2D(n_filt * (pow(2, deep - 2 - i)), 2, activation=activation, padding=padding,
+                   kernel_initializer=kernel_initializer, activity_regularizer=act_reg)(x)
+        merge = concatenate([cross_data.pop(), x], axis=channels)
+        x = Conv2D(n_filt * (pow(2, deep - 2 - i)), 3, activation=activation, padding=padding,
+                   kernel_initializer=kernel_initializer, activity_regularizer=act_reg)(merge)
+        x = Conv2D(n_filt * (pow(2, deep - 2 - i)), 3, activation=activation, padding=padding,
+                   kernel_initializer=kernel_initializer, activity_regularizer=act_reg)(x)
+        if (i == deep - 2):
+            x = Conv2D(2, 3, activation=activation, padding=padding,
+                       kernel_initializer=kernel_initializer, activity_regularizer=act_reg)(x)
+        x = BatchNormalization(axis=channels, activity_regularizer=act_reg)(x)
+
+    x = Conv2D(1, 1, activation='sigmoid')(x)
+    model = Model(inputs=inputs, outputs=x)
+    model.summary()
+    return model
+
+
+def clearer_model_new_deep(size=[512, 512]):
+    n_filt = 8
+
+    img_rows, img_cols = size[0], size[1]
+    input_shape = (img_rows, img_cols, 1)
+
+    inputs = Input(input_shape)
+    x = GaussianNoise(noise)(inputs)
+
+    deep = 2
+
+    for i in range(deep - 1):
+        x = Conv2D(n_filt * (pow(2, i)), 3, activation=activation, padding=padding,
+                   kernel_initializer=kernel_initializer, activity_regularizer=act_reg)(x)
+        x = Conv2D(n_filt * (pow(2, i)), 3, activation=activation, padding=padding,
+                   kernel_initializer=kernel_initializer, activity_regularizer=act_reg)(x)
+        x = BatchNormalization(axis=channels, activity_regularizer=act_reg)(x)
+        x = MaxPooling2D(pool_size=pool_size)(x)
+        x = Dropout(p_drop)(x)
+
+    x = Conv2D(n_filt * 16, 1, activation=activation, padding=padding,
+               kernel_initializer=kernel_initializer, activity_regularizer=act_reg)(x)
+    x = Conv2D(n_filt * 16, 1, activation=activation, padding=padding,
+               kernel_initializer=kernel_initializer, activity_regularizer=act_reg)(x)
+    x = Dropout(p_drop)(x)
+
+    for i in range(deep - 1):
+        x = UpSampling2D(size=pool_size)(x)
+        x = Conv2D(n_filt * (pow(2, deep - 2 - i)), 2, activation=activation, padding=padding,
+                   kernel_initializer=kernel_initializer, activity_regularizer=act_reg)(x)
+        x = Conv2D(n_filt * (pow(2, deep - 2 - i)), 3, activation=activation, padding=padding,
+                   kernel_initializer=kernel_initializer, activity_regularizer=act_reg)(x)
+        x = Conv2D(n_filt * (pow(2, deep - 2 - i)), 3, activation=activation, padding=padding,
+                   kernel_initializer=kernel_initializer, activity_regularizer=act_reg)(x)
+        if (i == deep - 2):
+            x = Conv2D(2, 3, activation=activation, padding=padding,
+                       kernel_initializer=kernel_initializer, activity_regularizer=act_reg)(x)
+        x = BatchNormalization(axis=channels, activity_regularizer=act_reg)(x)
+
+    x = Conv2D(1, 1, activation='sigmoid')(x)
+    model = Model(inputs=inputs, outputs=x)
+    model.summary()
+    return model
 
 
 def load_model():
