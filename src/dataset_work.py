@@ -8,7 +8,8 @@ from threading import Thread
 masks_path = '../dataset/results'
 img_x, img_y = 512, 512
 res_path = '../dataset/hard_cases'
-treads_number = 8
+treads_number = 8  # num of cores
+
 
 def green2rgb(image):
     res = np.zeros((image.shape[0], image.shape[1], 4))
@@ -48,7 +49,8 @@ def load_masks(num):
 def load_gener(num):
     return np.load(masks_path + '/gener_' + str(num) + '.npy')
 
-#-------------------------------------------------------------
+
+# -------------------------------------------------------------
 
 class XorTransformWorker(Thread):
 
@@ -58,7 +60,7 @@ class XorTransformWorker(Thread):
 
     def run(self):
         while True:
-            result, iter, full_image, deleter_image =  self.queue.get()
+            result, iter, full_image, deleter_image = self.queue.get()
             try:
                 result[iter] = xor_images(full_image, deleter_image)
             finally:
@@ -88,7 +90,7 @@ class G2RGBTransformWorker(Thread):
     def run(self):
         while True:
             # Get the work from the queue and expand the tuple
-            image, dir, iter = self.queue.get()
+            image, dir, i = self.queue.get()
             try:
                 res = green2rgb(image)
                 plt.imsave((res_path + dir + '{:04d}'.format(i) + '.png'), res)
@@ -137,12 +139,12 @@ def transform_results_gr2rgb(results_g, results_r, dir):
     queue.join()
 
 
-#-------------------------------------------------------------
+# -------------------------------------------------------------
 
 for i in range(5, 9):
     masks = load_masks(i)
     gener = load_gener(i)
-    print('Data loaded for patient ' + str(i))
+    print('\nData loaded for patient ' + str(i))
     membr = xor_image_sets(gener, masks)
     print('\nMembrans masks created for patient ' + str(i))
     np.save(masks_path + '/membr_' + str(i) + '.npy', membr)
@@ -153,6 +155,6 @@ for i in range(5, 9):
     print('\nSaving generated data for patient ' + str(i))
     transform_results_g2rgb(gener, dir_part + '_mask_bone_membr_onecol/')
     print('\nSaving membran mask data for patient ' + str(i))
-    transform_results_g2rgb(membr, dir_part + '_mask__membr/')
+    transform_results_g2rgb(membr, dir_part + '_mask_membr/')
     print('\nSaving cleared and membran mask data for patient ' + str(i))
     transform_results_gr2rgb(masks, membr, dir_part + '_mask_bone_membr/')

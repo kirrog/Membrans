@@ -1,17 +1,15 @@
 import glob
-import os
 import sys
 import cv2
 from natsort import natsorted
 import numpy as np
 
-dataset_path = '\\..\\dataset\\hard_cases'
+dataset_path = '../dataset/hard_cases'
 img_x, img_y = 512, 512
 
 def load_clearer_teset_set():
-    cwd = os.getcwd()
-    dataFold = cwd + dataset_path
-    paths_predicts = natsorted(glob.glob(dataFold + '\\*\\*.png'))
+    dataFold = dataset_path
+    paths_predicts = natsorted(glob.glob(dataFold + '/*/*.png'))
 
     set_predictors = np.zeros((len(paths_predicts), img_x, img_y, 1), dtype=np.float32)
 

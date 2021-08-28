@@ -11,7 +11,7 @@ from src.utils.augment_dataset_generator import augment_size, get_augment_datase
 
 # log_dir = '/content/drive/MyDrive/Membrans/models/clearer/logs/'
 
-log_dir = '..\\models\\clearer\\logs\\'
+log_dir = '../models/clearer/logs/'
 
 def load_orig_dataset():
   answers_orig = load_clearer_dataset_answers()

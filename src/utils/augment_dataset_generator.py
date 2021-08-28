@@ -6,12 +6,10 @@ from src.clearer.datasets_loader import load_clearer_dataset_to_numpy_table, sav
     load_clearer_dataset_predicts, load_clearer_dataset_answers
 
 # augments_path = '/content/drive/MyDrive/Membrans/dataset/numpys/augmentations'
-# predictors_path = '/pred_'
-# answers_path = '/answ_'
 
-augments_path = '\\..\\dataset\\numpys\\augmentations'
-predictors_path = '\\pred_'
-answers_path = '\\answ_'
+augments_path = '../dataset/numpys/augmentations'
+predictors_path = '/pred_'
+answers_path = '/answ_'
 
 augment_size = 10
 

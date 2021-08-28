@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 # res_path = '/content/drive/MyDrive/Membrans/dataset/results/'
 
-res_path = 'C:\MyProjects\PyProjects\Membrans\dataset\\results\\'
+res_path = '../dataset/results/'
 
 
 def green2rgb(image):

@@ -5,7 +5,7 @@ import tensorflow as tf
 
 #model_path = '/content/drive/MyDrive/Membrans/models/clearer/clearer_weights.h5'
 
-model_path = '..\\models\\clearer\\clearer_weights.h5'
+model_path = '../models/clearer/clearer_weights.h5'
 
 activation = 'relu'
 padding = 'same'

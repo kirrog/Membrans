@@ -2,7 +2,7 @@ from tensorflow.keras.layers import *
 from tensorflow.keras.models import *
 from tensorflow import keras
 
-model_path = '..\\models\\generator\\generator_weights.h5'
+model_path = '../models/generator/generator_weights.h5'
 
 def generator_model_new(size=[512, 512]):
     activation = 'relu'

@@ -1,5 +1,4 @@
 import glob
-import os
 import sys
 import cv2
 from natsort import natsorted
@@ -11,18 +10,15 @@ import numpy as np
 # predict_path = '/content/drive/MyDrive/Membrans/dataset/numpys/predictors.npy'
 # answers_path = '/content/drive/MyDrive/Membrans/dataset/numpys/answers.npy'
 # tests_path = '/content/drive/MyDrive/Membrans/dataset/numpys/test.npy'
-# paths_pred_masks = '/*/*_image/*.png'
-# paths_answ_masks = '/*/*_mask_bone/*.png'
-# paths_test_masks = '/*/*.png'
 
-dataset_path = '\\..\\dataset\\easy_cases'
-test_dataset_path = '\\..\\dataset\\hard_cases'
-predict_path = '..\\dataset\\numpys\\predictors.npy'
-answers_path = '..\\dataset\\numpys\\answers.npy'
-tests_path = '..\\dataset\\numpys\\test.npy'
-paths_pred_masks = '\\*\\*_image\\*.png'
-paths_answ_masks = '\\*\\*_mask_bone\\*.png'
-paths_test_masks = '\\*\\*.png'
+dataset_path = '../dataset/easy_cases'
+test_dataset_path = '../dataset/hard_cases'
+predict_path = '../dataset/numpys/predictors.npy'
+answers_path = '../dataset/numpys/answers.npy'
+tests_path = '../dataset/numpys/test.npy'
+paths_pred_masks = '/*/*_image/*.png'
+paths_answ_masks = '/*/*_mask_bone/*.png'
+paths_test_masks = '/*/*.png'
 
 img_x, img_y = 512, 512
 
@@ -69,7 +65,7 @@ def load_clearer_dataset_to_numpy_table(file_path):
 
 
 def load_clearer_dataset_from_images():
-    data_fold = os.getcwd() + dataset_path
+    data_fold = dataset_path
     paths_predicts = natsorted(glob.glob(data_fold + paths_pred_masks))
     paths_answers = natsorted(glob.glob(data_fold + paths_answ_masks))
 
@@ -92,7 +88,7 @@ def load_clearer_dataset_from_images():
 
 
 def load_clearer_predicts_from_images():
-    data_fold = os.getcwd() + dataset_path
+    data_fold = dataset_path
     paths_predicts = natsorted(glob.glob(data_fold + paths_pred_masks))
 
     set_predictors = np.zeros((len(paths_predicts), img_x, img_y, 1), dtype=np.float16)
@@ -105,7 +101,7 @@ def load_clearer_predicts_from_images():
 
 
 def load_clearer_answers_from_images():
-    data_fold = os.getcwd() + dataset_path
+    data_fold = dataset_path
     paths_answers = natsorted(glob.glob(data_fold + paths_answ_masks))
 
     set_answers = np.zeros((len(paths_answers), img_x, img_y, 1), dtype=np.float16)
@@ -124,8 +120,7 @@ def make_clearer_dataset():
 
 
 def load_test_dataset_from_images():
-    cwd = os.getcwd()
-    dataFold = cwd + test_dataset_path
+    dataFold = test_dataset_path
     paths_predicts = natsorted(glob.glob(dataFold + paths_test_masks))
 
     set_predictors = np.zeros((len(paths_predicts), img_x, img_y, 1), dtype=np.float16)

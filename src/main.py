@@ -6,12 +6,12 @@ import numpy as np
 from natsort import natsorted
 from tensorflow import keras
 
-patient_path = '..\\patient_data'
-clearer_model_path = '..\\result_models\\clearer_weights.h5'
-generator_model_path = '..\\result_models\\generator_weights.h5'
-teeth_finder_model_path = '..\\result_models\\teeth_finder_weights.h5'
-numpys_path = '..\\patient_data\\numpys\\'
-paths_pred_masks = '\\*_image\\*.png'
+patient_path = '../patient_data'
+clearer_model_path = '../result_models/clearer_weights.h5'
+generator_model_path = '../result_models/generator_weights.h5'
+teeth_finder_model_path = '../result_models/teeth_finder_weights.h5'
+numpys_path = '../patient_data/numpys/'
+paths_pred_masks = '/*_image/*.png'
 
 batch_size = 3
 img_x, img_y = 512, 512

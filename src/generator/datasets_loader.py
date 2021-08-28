@@ -6,9 +6,9 @@ import numpy as np
 # tests_path = '/content/drive/MyDrive/Membrans/dataset/numpys/generator/test.npy'
 
 
-predict_path = '..\\dataset\\numpys\\generator\\predictors.npy'
-answers_path = '..\\dataset\\numpys\\generator\\answers.npy'
-tests_path = '..\\dataset\\numpys\\generator\\test.npy'
+predict_path = '../dataset/numpys/generator/predictors.npy'
+answers_path = '../dataset/numpys/generator/answers.npy'
+tests_path = '../dataset/numpys/generator/test.npy'
 
 
 def save_generator_dataset_tests(numpy_table):

@@ -8,7 +8,7 @@ from src.clearer.trainer import train_clearer_model
 
 # model_path = '/content/drive/MyDrive/Membrans/models/clearer/clearer_weights_aug.h5'
 
-model_path = '\\..\\models\\clearer\\clearer_weights.h5'
+model_path = '../models/clearer/clearer_weights_aug.h5'
 
 tf.random.set_seed(2202)
 

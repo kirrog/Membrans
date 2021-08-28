@@ -3,13 +3,12 @@ import sys
 import numpy as np
 import pydicom as dicom
 import cv2
-import os
 from pathlib import Path
 
 
 # result_path = '/content/drive/MyDrive/Membrans/dataset/new/'
 
-result_path = os.getcwd() + '\\..\\dataset\\new\\'
+result_path = '../dataset/new/'
 
 def from_dcm_to_png(directory):
     p = Path(directory)
