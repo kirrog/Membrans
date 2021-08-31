@@ -3,4 +3,4 @@
 /venv/
 *.pyc
 /result_models/clearer_weights.h5
-/patient_data/
+/example/
