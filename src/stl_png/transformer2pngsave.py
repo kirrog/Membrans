@@ -3,8 +3,6 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 
-# res_path = '/content/drive/MyDrive/Membrans/dataset/results/'
-
 res_path = '../dataset/results/'
 
 
@@ -15,15 +13,6 @@ def green2rgb(image):
             if image[i][j] > 0.15:
                 res[i][j][1] = image[i][j]
     return res
-
-
-def check_results(results):
-    min_v = 1
-    max_v = 0
-    for image in results:
-        min_v = min(min_v, image.min())
-        max_v = max(max_v, image.max())
-    print('min: ' + str(min_v) + ' max: ' + str(max_v))
 
 
 def transform_results(results, dir):

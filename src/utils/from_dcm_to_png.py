@@ -1,3 +1,4 @@
+import glob
 import sys
 
 import numpy as np
@@ -7,13 +8,13 @@ from pathlib import Path
 
 
 # result_path = '/content/drive/MyDrive/Membrans/dataset/new/'
+from natsort import natsorted
 
 result_path = '../dataset/new/'
 
 def from_dcm_to_png(directory):
-    p = Path(directory)
-    files = [x for x in p.iterdir() if x.is_file()]
-    for file,iter in zip(files, range(1, len(files) + 1)):
+    paths_predicts = natsorted(glob.glob(directory + '\\*.dcm'))
+    for file,iter in zip(paths_predicts, range(1, len(paths_predicts) + 1)):
         read_write_file(file, '{:03}'.format(iter))
 
 
@@ -28,4 +29,4 @@ def read_write_file(file_path, iter):
     image_path = result_path + (iter) + image_format
 
     cv2.imwrite(image_path, image_2d_scaled)
-    sys.stdout.write("\rImage %i transformed to png" % iter)
+    sys.stdout.write("\rImage %s transformed to png" % iter)
