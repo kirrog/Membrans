@@ -100,8 +100,12 @@ def figure_check(figure, x, y, x_scaler, y_scaler):
 
 
 def make_array_from_figure(array, figure, corr_x, corr_y, x_scaler, y_scaler):
-    for i in range(array.shape[0]):
-        for j in range(array.shape[1]):
+    x_start = int(figure.x_min/x_scaler)
+    x_stop = int(figure.x_max/x_scaler)
+    y_start = int(figure.y_min/y_scaler)
+    y_stop = int(figure.y_max/y_scaler)
+    for i in range(x_start, x_stop):
+        for j in range(y_start, y_stop):
             col = figure_check(figure, i - corr_x, j - corr_y, x_scaler, y_scaler)
             if col >= 0:
                 array[i][j] = col
@@ -201,7 +205,7 @@ def form_figures_from_lines(lines):
                 print('Found uncycled varient')
                 fir = result[0]
                 last = result[len(result) - 1]
-                middle = line(fir.x2, fir.y2, last.x1, last.y1, fir.normx + last.normx, fir.normy + last.normy)
+                middle = cl.line(fir.x2, fir.y2, last.x1, last.y1, fir.normx + last.normx, fir.normy + last.normy)
                 result.append(middle)
                 numbers[x2_line.index(fir)][1] = 1
                 numbers[x1_line.index(last)][0] = 1

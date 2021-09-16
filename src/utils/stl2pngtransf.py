@@ -6,7 +6,8 @@ from src.stl_png.classes import vertex, triangle
 from src.stl_png.transformer import stl2pngs
 from src.utils.results_transformer import transform_results
 
-stl_bone_path = '../dataset/stl/001/Bone.stl'
+stl_bone_path = '/media/kirrog/data/dataset/stl/001//Bone.stl'
+
 
 your_mesh = mesh.Mesh.from_file(stl_bone_path)
 triangles = []
