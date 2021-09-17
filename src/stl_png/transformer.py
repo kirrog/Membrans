@@ -100,10 +100,10 @@ def figure_check(figure, x, y, x_scaler, y_scaler):
 
 
 def make_array_from_figure(array, figure, corr_x, corr_y, x_scaler, y_scaler):
-    x_start = int(figure.x_min/x_scaler)
-    x_stop = int(figure.x_max/x_scaler)
-    y_start = int(figure.y_min/y_scaler)
-    y_stop = int(figure.y_max/y_scaler)
+    x_start = int(figure.x_min / x_scaler)
+    x_stop = int(figure.x_max / x_scaler)
+    y_start = int(figure.y_min / y_scaler)
+    y_stop = int(figure.y_max / y_scaler)
     for i in range(x_start, x_stop):
         for j in range(y_start, y_stop):
             col = figure_check(figure, i - corr_x, j - corr_y, x_scaler, y_scaler)
@@ -167,6 +167,7 @@ def form_figures_from_lines(lines):
     figures = []
     numbers = np.zeros((len(lines), 2))
     work = True
+    uncycled_figures = 0
     while work:
         result = []
         iterator_x1 = -1
@@ -202,7 +203,7 @@ def form_figures_from_lines(lines):
                     break
             if added_size_next == 0:
                 # it may need corrections
-                print('Found uncycled varient')
+                uncycled_figures += 1
                 fir = result[0]
                 last = result[len(result) - 1]
                 middle = cl.line(fir.x2, fir.y2, last.x1, last.y1, fir.normx + last.normx, fir.normy + last.normy)
@@ -213,7 +214,7 @@ def form_figures_from_lines(lines):
                 added_size_next = 0
             added_size = added_size_next
         figures.append(cl.figure(result))
-        sys.stdout.write("\rFigure %i appended" % len(figures))
+        sys.stdout.write("\rFigure %i appended, %i uncycled" % (len(figures), uncycled_figures))
     return figures
 
 
@@ -258,7 +259,7 @@ def stl2pngs(triangles, slices=512):
         slice = []
         z_lvl = step * (i + 0.5) + min_z
         for triangle in triangle_slices_numbers[i]:
-            res = get_triangle_slice_line(z_lvl, triangle, accuracy)
+            res = get_triangle_slice_line(z_lvl, triangle, accuracy)  # return scaled lines
             if res != 0:
                 slice.append(res)
         triangle_slices_numbers[i].clear()
