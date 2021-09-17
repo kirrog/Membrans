@@ -3,11 +3,51 @@ class vertex:
     y = 0.0
     z = 0.0
 
+    triangles = []
+
     def __init__(self, xIn, yIn, zIn):
         self.x = xIn
         self.y = yIn
         self.z = zIn
 
+    def __eq__(self, other):
+        if (self.x == other.x and self.y == other.y and self.z == other.z):
+            return True
+        else:
+            return False
+
+    def __hash__(self):
+        h1 = hash(self.x)
+        h2 = hash(self.y)
+        h3 = hash(self.z)
+        return h1 + h2 + h3
+
+    def add_triangle(self, triangle):
+        self.triangles.append(triangle)
+
+class vertex2d:
+    x = 0.0
+    y = 0.0
+
+    lines = []
+
+    def __init__(self, xIn, yIn):
+        self.x = xIn
+        self.y = yIn
+
+    def __eq__(self, other):
+        if (self.x == other.x and self.y == other.y):
+            return True
+        else:
+            return False
+
+    def __hash__(self):
+        h1 = hash(self.x)
+        h2 = hash(self.y)
+        return h1 + h2
+
+    def add_triangle(self, line):
+        self.lines.append(line)
 
 class triangle:
     v1 = vertex
@@ -19,7 +59,18 @@ class triangle:
         self.v1 = v1In
         self.v2 = v2In
         self.v3 = v3In
+        v1In.add_triangle(self)
+        v2In.add_triangle(self)
+        v3In.add_triangle(self)
         self.normal = normalIn
+
+    def add_vertex(self, vert):
+        if self.v1.__eq__(vert):
+            self.v1 = vert
+        if self.v2.__eq__(vert):
+            self.v2 = vert
+        if self.v3.__eq__(vert):
+            self.v3 = vert
 
 
 class line:
