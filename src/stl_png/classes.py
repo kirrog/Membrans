@@ -25,6 +25,7 @@ class vertex:
     def add_triangle(self, triangle):
         self.triangles.append(triangle)
 
+
 class vertex2d:
     x = 0.0
     y = 0.0
@@ -46,8 +47,9 @@ class vertex2d:
         h2 = hash(self.y)
         return h1 + h2
 
-    def add_triangle(self, line):
+    def add_line(self, line):
         self.lines.append(line)
+
 
 class triangle:
     v1 = vertex
@@ -64,6 +66,11 @@ class triangle:
         v3In.add_triangle(self)
         self.normal = normalIn
 
+    def clear(self):
+        self.v1.triangles.remove(self)
+        self.v2.triangles.remove(self)
+        self.v3.triangles.remove(self)
+
     def add_vertex(self, vert):
         if self.v1.__eq__(vert):
             self.v1 = vert
@@ -74,20 +81,26 @@ class triangle:
 
 
 class line:
-    x1 = 0.0
-    y1 = 0.0
-    x2 = 0.0
-    y2 = 0.0
-    normx = 0.0
-    normy = 0.0
+    v1 = vertex2d
+    v2 = vertex2d
+    norm = vertex2d
 
-    def __init__(self, x1In, y1In, x2In, y2In, normxIn, normyIn):
-        self.x1 = x1In
-        self.y1 = y1In
-        self.x2 = x2In
-        self.y2 = y2In
-        self.normx = normxIn
-        self.normy = normyIn
+    def __init__(self, v1In, v2In, normIn):
+        self.v1 = v1In
+        self.v2 = v2In
+        v1In.add_line(self)
+        v2In.add_line(self)
+        self.norm = normIn
+
+    def clear(self):
+        self.v1.lines.remove(self)
+        self.v2.lines.remove(self)
+
+    def add_vertex2d(self, vert):
+        if self.v1.__eq__(vert):
+            self.v1 = vert
+        if self.v2.__eq__(vert):
+            self.v2 = vert
 
 
 class figure:

@@ -31,6 +31,138 @@ def find_triangle_place(triangle, min_v, max_v, slices):
         return range(min_local, max_local)
 
 
+def scale_norm(norm):
+    k = norm.y / norm.x
+    y = math.sqrt((pow(k, 2)) / (1 + pow(k, 2)))
+    x = y / k
+    return cl.vertex2d(x, y)
+
+
+def get_lines(iterator, cycle):
+    if len(cycle) - 1 == iterator:
+        return cycle[iterator], cycle[0]
+    else:
+        return cycle[iterator], cycle[iterator + 1]
+
+
+def is_lines_unitable(l1, l2, accuracy):
+    normy = l1.norm.y + l2.norm.y
+    normx = l1.norm.x + l2.norm.x
+    norm = scale_norm(cl.vertex2d(normx, normy))
+    vertx = norm.x * (l1.v2.x - l1.v1.x) + norm.y * (l1.v2.y - l1.v1.y)
+    if vertx <= pow(0.1, accuracy - 1):
+        return True, norm
+    else:
+        return False, norm
+
+
+def shrink_lines_in_slice(cycle, accuracy):  # cycle throw the line
+    lines_new = []
+    iterator = 0
+    without_change = 0
+    size = len(cycle)
+    while True:
+        line_p, line_n = get_lines(iterator, cycle)
+        bo, norm = is_lines_unitable(line_p, line_n, accuracy)
+        if bo:
+            l = cl.line(line_p.v1, line_n.v2, norm)
+            line_p.v1.lines.remove(line_p)
+            line_p.v2.lines.remove(line_p)
+            line_n.v1.lines.remove(line_n)
+            line_n.v2.lines.remove(line_n)
+            lines_new.append(l)
+            iterator += 2
+        else:
+            lines_new.append(line_p)
+            without_change += 1
+            iterator += 1
+        if without_change == size:
+            break
+        if iterator >= size:
+            without_change = 0
+            iterator = 0
+            cycle = lines_new
+            lines_new = []
+    return lines_new
+
+
+def get_neighbour_lines_of_x2(line):
+    t = line.v2.lines.copy()
+    t.remove(line)
+    return t
+
+
+def find_figures(lines):  # from set of lines get time figures
+    figures = []
+    wrong_neigbours = 0
+    dead_ends = 0
+    check = np.zeros(len(lines))
+    while True:
+        iterator = -1
+        for i, it in zip(check, range(len(lines))):
+            if i == 0:
+                iterator = it
+                check[it] = 1
+                break
+        if iterator == -1:
+            break
+        fig = []
+        start = lines[iterator]
+        temp = start
+        while True:
+            t = get_neighbour_lines_of_x2(temp)
+            if len(t) > 1:
+                wrong_neigbours += len(t) - 1
+            if len(t) == 0:
+                dead_ends += 1
+                break
+            temp = t[0]
+            ind = lines.index(temp)
+            check[ind] = 1
+            fig.append(temp)
+            if temp == start:
+                break
+        figures.append(fig)
+    if wrong_neigbours > 0:
+        print("\nNumber of wrong neighbours " + str(wrong_neigbours))
+    if dead_ends > 0:
+        print("\nNumber of dead ends " + str(dead_ends))
+    return figures
+
+
+def make_figures_from_slice(z_lvl, triangles_slice, accuracy):
+    lines = []
+    size = len(triangles_slice)
+    vertexes = []
+    for i in range(size):
+        line = get_triangle_slice_line(z_lvl, triangles_slice[i])
+        vertexes.append(line.v1)
+        vertexes.append(line.v2)
+        lines.append(line)
+        if i % 10000 == 0:
+            sys.stdout.write("\rLines %i get" % i)
+    vertexes.sort(key=lambda vert: vert.__hash__())
+    vert = None
+    res_vert = 0
+    for i in vertexes:
+        if type(vert) == type(None):
+            vert = i
+        else:
+            if vert.__eq__(i):
+                vert.lines.append(i.lines[0])
+                i.lines[0].add_vertex2d(vert)
+            else:
+                res_vert += 1
+                vert = i
+    print("\nCreated " + str(len(lines)) + " with " + str(res_vert) + " vertexes")
+    vertexes.clear()
+    finded_lines = find_figures(lines)
+    figures = []
+    for fig in finded_lines:
+        figures.append(cl.figure(shrink_lines_in_slice(fig, accuracy)))
+    return figures
+
+
 def get_point(z_lvl, v1, v2):
     universal = 0.0
     if v1.z - v2.z == 0.0:
@@ -42,15 +174,16 @@ def get_point(z_lvl, v1, v2):
         universal = (z_lvl - v2.z) / (v1.z - v2.z)
     x = (universal * (v1.x - v2.x)) + v2.x
     y = (universal * (v1.y - v2.y)) + v2.y
-    return cl.vertex(x, y, z_lvl)
+    return cl.vertex2d(x, y)
 
 
-def get_triangle_slice_line(z_lvl, triangle, accuracy):
+def get_triangle_slice_line(z_lvl, triangle):  # add a check of v1 and v2 order
     points = get_triangle_slice_points(z_lvl, triangle)
     if len(points) > 1:
-        return cl.line(round(points[0].x, accuracy), round(points[0].y, accuracy), round(points[1].x, accuracy),
-                       round(points[1].y, accuracy), round(triangle.normal.x, accuracy),
-                       round(triangle.normal.y, accuracy))
+        v1 = cl.vertex2d(points[0].x, points[0].y)
+        v2 = cl.vertex2d(points[1].x, points[1].y)
+        norm = scale_norm(cl.vertex2d(triangle.normal.x, triangle.normal.y))
+        return cl.line(v1, v2, norm)
     else:
         return 0
 
@@ -72,13 +205,13 @@ def get_triangle_slice_points(z_lvl, triangle):
     p1 = get_point(z_lvl, triangle.v1, triangle.v2)
     p2 = get_point(z_lvl, triangle.v2, triangle.v3)
     p3 = get_point(z_lvl, triangle.v1, triangle.v3)
-    if p1 != -1:
+    if isinstance(p1, cl.vertex2d):
         if x_min <= p1.x <= x_max and y_min <= p1.y <= y_max:
             res.append(p1)
-    if p2 != -1:
+    if isinstance(p2, cl.vertex2d):
         if x_min <= p2.x <= x_max and y_min <= p2.y <= y_max:
             res.append(p2)
-    if p3 != -1:
+    if isinstance(p3, cl.vertex2d):
         if x_min <= p3.x <= x_max and y_min <= p3.y <= y_max:
             res.append(p3)
     return list(set(res))
@@ -90,8 +223,8 @@ def figure_check(figure, x, y, x_scaler, y_scaler):
     for line in figure.lines:
         dist = (x - (line.x1 / x_scaler)) * line.normx + (y - (line.y1 / y_scaler)) * line.normy
         if minimal_dist > abs(dist):
-            left_dist = pow(x - (line.x1 / x_scaler), 2) + pow(y - (line.y1 / y_scaler), 2)
-            right_dist = pow(x - (line.x2 / x_scaler), 2) + pow(y - (line.y2 / y_scaler), 2)
+            left_dist = pow(x - (line.v1.x / x_scaler), 2) + pow(y - (line.v1.y / y_scaler), 2)
+            right_dist = pow(x - (line.v2.x / x_scaler), 2) + pow(y - (line.v2.y / y_scaler), 2)
             minimal_dist = abs(dist)
             dist_res = - dist
             if abs(dist) < left_dist and abs(dist) < right_dist:
@@ -112,113 +245,7 @@ def make_array_from_figure(array, figure, corr_x, corr_y, x_scaler, y_scaler):
     return array
 
 
-def lines_neighbors(l1, l2):
-    if pow(l1.x1 - l2.x2, 2) + pow(l1.y1 - l2.y2, 2) == 0.0:
-        return -1
-    if pow(l1.x2 - l2.x1, 2) + pow(l1.y2 - l2.y1, 2) == 0.0:
-        return -1
-    return 0
-
-
-def form_figures_from_lines_slow(lines):
-    figures = []
-    numbers = np.zeros(len(lines))
-    work = True
-    while work:
-        result = []
-        iterator = -1
-        for i, it in zip(numbers, range(numbers.size)):
-            if i != 1:
-                iterator = it
-                numbers[it] = 1
-                break
-        if iterator == -1:
-            work = False
-            break
-        l = lines[iterator]
-        result.append(l)
-        added = [l]
-        added_size = 1
-        while added_size > 0:
-            ad_next = []
-            added_size_next = 0
-            for line in added:
-                for i, it in zip(numbers, range(len(numbers))):
-                    if i != 1 and lines_neighbors(line, lines[it]) != 0:
-                        result.append(lines[it])
-                        ad_next.append(lines[it])
-                        added_size_next += 1
-                        numbers[it] = 1
-            added = ad_next
-            added_size = added_size_next
-        figures.append(cl.figure(result))
-        found = False
-        for i in numbers:
-            if i == 0:
-                found = True
-                break
-        work = found
-    return figures
-
-
-def form_figures_from_lines(lines):
-    x1_line = sorted(lines, key=lambda line: line.x1)
-    x2_line = sorted(lines, key=lambda line: line.x2)
-    figures = []
-    numbers = np.zeros((len(lines), 2))
-    work = True
-    uncycled_figures = 0
-    while work:
-        result = []
-        iterator_x1 = -1
-        for it in range(len(lines)):
-            if numbers[it][0] != 1:
-                iterator_x1 = it
-                break
-        if iterator_x1 == -1:
-            work = False
-            break
-        added_size = 1
-        while added_size > 0:
-            l = x1_line[iterator_x1]
-            result.append(l)
-            numbers[iterator_x1][0] = 1
-            added_size_next = 0
-            iterator_x2 = iterator_x1
-            for line_ind in range(iterator_x2, -1, -1):  # searching start of equals x2
-                if x2_line[line_ind].x2 < l.x1:
-                    if iterator_x2 > line_ind >= 0:
-                        iterator_x2 = line_ind + 1
-                    break
-                if line_ind == 0:
-                    iterator_x2 = line_ind
-            for line, key in zip(x2_line[iterator_x2:], range(iterator_x2, numbers.size)):
-                if numbers[key][1] != 1 and line.x2 == l.x1 and line.y2 == l.y1:
-                    numbers[key][1] = 1
-                    iterator_x1 = x1_line.index(line)
-                    if numbers[iterator_x1][0] == 1:
-                        added_size_next = -1
-                    else:
-                        added_size_next = 1
-                    break
-            if added_size_next == 0:
-                # it may need corrections
-                uncycled_figures += 1
-                fir = result[0]
-                last = result[len(result) - 1]
-                middle = cl.line(fir.x2, fir.y2, last.x1, last.y1, fir.normx + last.normx, fir.normy + last.normy)
-                result.append(middle)
-                numbers[x2_line.index(fir)][1] = 1
-                numbers[x1_line.index(last)][0] = 1
-            if added_size_next == -1:
-                added_size_next = 0
-            added_size = added_size_next
-        figures.append(cl.figure(result))
-        sys.stdout.write("\rFigure %i appended, %i uncycled" % (len(figures), uncycled_figures))
-    return figures
-
-
-def stl2pngs(triangles, slices=512):
+def get_scaler_variables(triangles, slices):
     max_x = sys.maxsize * (-2)
     max_y = sys.maxsize * (-2)
     max_z = sys.maxsize * (-2)
@@ -241,41 +268,35 @@ def stl2pngs(triangles, slices=512):
     while t == 0:
         accuracy += 1
         t = round(temperal_accuracy, accuracy)
+    return min_z, max_z, x_scaler, y_scaler, accuracy, step
+
+
+def stl2pngs(triangles, slices=512):
+    min_z, max_z, x_scaler, y_scaler, accuracy, step = get_scaler_variables(triangles, slices)
     triangle_slices_numbers = []
     for i in range(slices):
         tri_slice_numbers = []
         triangle_slices_numbers.append(tri_slice_numbers)
     for triangle, i in zip(triangles, range(len(triangles))):
-        res = (find_triangle_place(triangle, min_z, max_z, slices))
+        res = find_triangle_place(triangle, min_z, max_z, slices)
         if res != -1:
             for r in res:
                 triangle_slices_numbers[r].append(triangle)
+        else:
+            triangle.clear()
         if i % 10000 == 0:
             sys.stdout.write("\rTriangle %i sorted" % i)
     print()
     triangles.clear()
-    slices_points = []
-    for i in range(slices):
-        slice = []
-        z_lvl = step * (i + 0.5) + min_z
-        for triangle in triangle_slices_numbers[i]:
-            res = get_triangle_slice_line(z_lvl, triangle, accuracy)  # return scaled lines
-            if res != 0:
-                slice.append(res)
-        triangle_slices_numbers[i].clear()
-        slices_points.append(slice)
-        sys.stdout.write("\rSlice %i collected" % i)
-    print()
-    triangle_slices_numbers.clear()
     result = []
     for i in range(slices):
         array = np.zeros((x_size, y_size), dtype=np.float16)
-        figures = form_figures_from_lines(slices_points[i])
-        slices_points[i].clear()
+        z_lvl = step * (i + 0.5) + min_z
+        figures = make_figures_from_slice(z_lvl, triangle_slices_numbers[i], accuracy)
         for fig in figures:
             array = make_array_from_figure(array, fig, x_size / 2, y_size / 2, x_scaler, y_scaler)
         result.append(array)
         sys.stdout.write("\rSlice %i created" % i)
     print()
-    slices_points.clear()
+    triangle_slices_numbers.clear()
     return result

@@ -35,6 +35,6 @@ def load_triangles_from_stl(path):
             else:
                 res_vert += 1
                 vert = i
-    print("\nCreated + " + str(len(triangles)) + " with " + str(res_vert) + " vertexes" )
+    print("\nCreated " + str(len(triangles)) + " with " + str(res_vert) + " vertexes")
     vertexes.clear()
     return triangles
