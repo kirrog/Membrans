@@ -177,7 +177,7 @@ def get_point(z_lvl, v1, v2):
     return cl.vertex2d(x, y)
 
 
-def get_triangle_slice_line(z_lvl, triangle):  # add a check of v1 and v2 order
+def get_triangle_slice_line(z_lvl, triangle):
     points = get_triangle_slice_points(z_lvl, triangle)
     if len(points) > 1:
         v1 = cl.vertex2d(points[0].x, points[0].y)
@@ -218,10 +218,10 @@ def get_triangle_slice_points(z_lvl, triangle):
 
 
 def print_line(array, line, corr_x, corr_y, x_scaler, y_scaler):
-    x_start = int((min(line.x1, line.x2) / x_scaler) + corr_x)
-    x_stop = int((max(line.x1, line.x2) / x_scaler) + corr_x)
-    y_start = int((min(line.y1, line.y2) / y_scaler) + corr_y)
-    y_stop = int((max(line.y1, line.y2) / y_scaler) + corr_y)
+    x_start = int((min(line.v1.x, line.v2.x) / x_scaler) + corr_x)
+    x_stop = int((max(line.v1.x, line.v2.x) / x_scaler) + corr_x)
+    y_start = int((min(line.v1.y, line.v2.y) / y_scaler) + corr_y)
+    y_stop = int((max(line.v1.y, line.v2.y) / y_scaler) + corr_y)
     array[x_start][y_start] = 1
     array[x_stop][y_stop] = 1
     if x_start != x_stop:
@@ -260,61 +260,63 @@ def make_array_from_figures(figures, corr_x, corr_y, x_scaler, y_scaler):
                 res[i][j] = 1
     return res
 
-def form_figures_from_lines(lines):
-    x1_line = sorted(lines, key=lambda line: line.x1)
-    x2_line = sorted(lines, key=lambda line: line.x2)
-    figures = []
-    numbers = np.zeros((len(lines), 2))
-    work = True
-    uncycled_figures = 0
-    while work:
-        result = []
-        iterator_x1 = -1
-        for it in range(len(lines)):
-            if numbers[it][0] != 1:
-                iterator_x1 = it
-                break
-        if iterator_x1 == -1:
-            work = False
-            break
-        added_size = 1
-        while added_size > 0:
-            l = x1_line[iterator_x1]
-            result.append(l)
-            numbers[iterator_x1][0] = 1
-            added_size_next = 0
-            iterator_x2 = iterator_x1
-            for line_ind in range(iterator_x2, -1, -1):  # searching start of equals x2
-                if x2_line[line_ind].x2 < l.x1:
-                    if iterator_x2 > line_ind >= 0:
-                        iterator_x2 = line_ind + 1
-                    break
-                if line_ind == 0:
-                    iterator_x2 = line_ind
-            for line, key in zip(x2_line[iterator_x2:], range(iterator_x2, numbers.size)):
-                if numbers[key][1] != 1 and line.x2 == l.x1 and line.y2 == l.y1:
-                    numbers[key][1] = 1
-                    iterator_x1 = x1_line.index(line)
-                    if numbers[iterator_x1][0] == 1:
-                        added_size_next = -1
-                    else:
-                        added_size_next = 1
-                    break
-            if added_size_next == 0:
-                # it may need corrections
-                uncycled_figures += 1
-                fir = result[0]
-                last = result[len(result) - 1]
-                middle = cl.line(fir.x2, fir.y2, last.x1, last.y1, fir.normx + last.normx, fir.normy + last.normy)
-                result.append(middle)
-                numbers[x2_line.index(fir)][1] = 1
-                numbers[x1_line.index(last)][0] = 1
-            if added_size_next == -1:
-                added_size_next = 0
-            added_size = added_size_next
-        figures.append(cl.figure(result))
-        # sys.stdout.write("\rFigure %i appended, %i uncycled" % (len(figures), uncycled_figures))
-    return figures
+
+# def form_figures_from_lines(lines):
+#     x1_line = sorted(lines, key=lambda line: line.x1)
+#     x2_line = sorted(lines, key=lambda line: line.x2)
+#     figures = []
+#     numbers = np.zeros((len(lines), 2))
+#     work = True
+#     uncycled_figures = 0
+#     while work:
+#         result = []
+#         iterator_x1 = -1
+#         for it in range(len(lines)):
+#             if numbers[it][0] != 1:
+#                 iterator_x1 = it
+#                 break
+#         if iterator_x1 == -1:
+#             work = False
+#             break
+#         added_size = 1
+#         while added_size > 0:
+#             l = x1_line[iterator_x1]
+#             result.append(l)
+#             numbers[iterator_x1][0] = 1
+#             added_size_next = 0
+#             iterator_x2 = iterator_x1
+#             for line_ind in range(iterator_x2, -1, -1):  # searching start of equals x2
+#                 if x2_line[line_ind].x2 < l.x1:
+#                     if iterator_x2 > line_ind >= 0:
+#                         iterator_x2 = line_ind + 1
+#                     break
+#                 if line_ind == 0:
+#                     iterator_x2 = line_ind
+#             for line, key in zip(x2_line[iterator_x2:], range(iterator_x2, numbers.size)):
+#                 if numbers[key][1] != 1 and line.x2 == l.x1 and line.y2 == l.y1:
+#                     numbers[key][1] = 1
+#                     iterator_x1 = x1_line.index(line)
+#                     if numbers[iterator_x1][0] == 1:
+#                         added_size_next = -1
+#                     else:
+#                         added_size_next = 1
+#                     break
+#             if added_size_next == 0:
+#                 # it may need corrections
+#                 uncycled_figures += 1
+#                 fir = result[0]
+#                 last = result[len(result) - 1]
+#                 middle = cl.line(fir.x2, fir.y2, last.x1, last.y1, fir.normx + last.normx, fir.normy + last.normy)
+#                 result.append(middle)
+#                 numbers[x2_line.index(fir)][1] = 1
+#                 numbers[x1_line.index(last)][0] = 1
+#             if added_size_next == -1:
+#                 added_size_next = 0
+#             added_size = added_size_next
+#         figures.append(cl.figure(result))
+#         # sys.stdout.write("\rFigure %i appended, %i uncycled" % (len(figures), uncycled_figures))
+#     return figures
+
 
 def get_scaler_variables(triangles, slices):
     max_x = sys.maxsize * (-2)
@@ -366,8 +368,8 @@ def stl2pngs(triangles, slices=512):
         slice = []
         z_lvl = step * (i + 0.5) + min_z
         for triangle in triangle_slices_numbers[i]:
-            res = get_triangle_slice_line(z_lvl, triangle, accuracy)  # return scaled lines
-            if res != 0:
+            res = get_triangle_slice_line(z_lvl, triangle)
+            if isinstance(res, cl.line):
                 slice.append(res)
         triangle_slices_numbers[i].clear()
         slices_points.append(slice)
