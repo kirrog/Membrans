@@ -4,7 +4,7 @@
 # from clearer.clearer_model import clearer_model_new_deep
 
 from src.clearer.datasets_loader import load_clearer_dataset_predicts
-from src.utils.results_transformer import transform_results, check_results
+from src.utils.matrix2png_saver import transform_results, check_results
 from src.clearer.clearer_model import clearer_model_new_deep
 
 output_path = 'test/'

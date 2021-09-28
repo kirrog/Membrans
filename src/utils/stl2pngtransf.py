@@ -4,7 +4,7 @@ from stl import mesh
 
 from src.stl_png.classes import vertex, triangle
 from src.stl_png.transformer import stl2pngs
-from src.utils.results_transformer import transform_results
+from src.utils.matrix2png_saver import transform_results
 
 stl_bone_path = '/media/kirrog/data/dataset/stl/001//Bone.stl'
 
@@ -22,5 +22,5 @@ for i in range(size):
     if i % 10000 == 0:
         sys.stdout.write("\rTriangle %i loaded" % i)
 print('\nCreated')
-images = stl2pngs(triangles, 49)
+images = stl2pngs(triangles, 512)
 transform_results(images, 'stl/')
