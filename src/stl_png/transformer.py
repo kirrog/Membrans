@@ -217,32 +217,48 @@ def get_triangle_slice_points(z_lvl, triangle):
     return list(set(res))
 
 
-def figure_check(figure, x, y, x_scaler, y_scaler):
-    minimal_dist = sys.maxsize * 2 + 1
-    dist_res = -1
+def print_line(array, line, corr_x, corr_y, x_scaler, y_scaler):
+    x_start = int((min(line.x1, line.x2) / x_scaler) + corr_x)
+    x_stop = int((max(line.x1, line.x2) / x_scaler) + corr_x)
+    y_start = int((min(line.y1, line.y2) / y_scaler) + corr_y)
+    y_stop = int((max(line.y1, line.y2) / y_scaler) + corr_y)
+    array[x_start][y_start] = 1
+    array[x_stop][y_stop] = 1
+    if x_start != x_stop:
+        koef = float(y_start - y_stop) / float(x_start - x_stop)
+    else:
+        koef = 0
+    for i in range(x_start, x_stop):
+        if y_start + int((i - x_start) * koef) < y_stop:
+            array[i][y_start + int((i - x_start) * koef)] = 1
+
+
+def print_figure_on_array(array, figure, corr_x, corr_y, x_scaler, y_scaler):
     for line in figure.lines:
-        dist = (x - (line.x1 / x_scaler)) * line.normx + (y - (line.y1 / y_scaler)) * line.normy
-        if minimal_dist > abs(dist):
-            left_dist = pow(x - (line.v1.x / x_scaler), 2) + pow(y - (line.v1.y / y_scaler), 2)
-            right_dist = pow(x - (line.v2.x / x_scaler), 2) + pow(y - (line.v2.y / y_scaler), 2)
-            minimal_dist = abs(dist)
-            dist_res = - dist
-            if abs(dist) < left_dist and abs(dist) < right_dist:
-                dist_res = -1
-    return dist_res
-
-
-def make_array_from_figure(array, figure, corr_x, corr_y, x_scaler, y_scaler):
-    x_start = int(figure.x_min / x_scaler)
-    x_stop = int(figure.x_max / x_scaler)
-    y_start = int(figure.y_min / y_scaler)
-    y_stop = int(figure.y_max / y_scaler)
+        print_line(array, line, corr_x, corr_y, x_scaler, y_scaler)
+    x_start = int((figure.x_min / x_scaler) + corr_x)
+    x_stop = int((figure.x_max / x_scaler) + corr_x)
+    y_start = int((figure.y_min / y_scaler) + corr_y)
+    y_stop = int((figure.y_max / y_scaler) + corr_y)
+    check = False
     for i in range(x_start, x_stop):
         for j in range(y_start, y_stop):
-            col = figure_check(figure, i - corr_x, j - corr_y, x_scaler, y_scaler)
-            if col >= 0:
-                array[i][j] = col
-    return array
+            if array[i][j] > 0:
+                check = not check
+            elif check:
+                array[i][j] = 1
+
+
+def make_array_from_figures(figures, corr_x, corr_y, x_scaler, y_scaler):
+    array = np.zeros((len(figures), x_size, y_size), dtype=np.int8)
+    for figure, i in zip(figures, range(len(figures))):
+        print_figure_on_array(array[i], figure, corr_x, corr_y, x_scaler, y_scaler)
+    res = np.sum(array, axis=0)
+    for i in range(x_size):
+        for j in range(y_size):
+            if res[i][j] > 1:
+                res[i][j] = 1
+    return res
 
 
 def get_scaler_variables(triangles, slices):
@@ -260,19 +276,21 @@ def get_scaler_variables(triangles, slices):
         min_y = min(triangle.v1.y, triangle.v2.y, triangle.v3.y, min_y)
         min_z = min(triangle.v1.z, triangle.v2.z, triangle.v3.z, min_z)
     step = float(max_z - min_z) / slices
-    x_scaler = (max_x - min_x) / x_size
-    y_scaler = (max_y - min_y) / y_size
+    x_scaler = abs(max_x - min_x) * 1.1 / x_size
+    y_scaler = abs(max_y - min_y) * 1.1 / y_size
+    corr_x = -(min_x / x_scaler)
+    corr_y = -(min_y / y_scaler)
     accuracy = 0
     temperal_accuracy = math.sqrt(pow(x_scaler, 2) / 2 + pow(y_scaler, 2) / 2)
     t = 0
     while t == 0:
         accuracy += 1
         t = round(temperal_accuracy, accuracy)
-    return min_z, max_z, x_scaler, y_scaler, accuracy, step
+    return min_z, max_z, x_scaler, y_scaler, accuracy, step, corr_x, corr_y
 
 
 def stl2pngs(triangles, slices=512):
-    min_z, max_z, x_scaler, y_scaler, accuracy, step = get_scaler_variables(triangles, slices)
+    min_z, max_z, x_scaler, y_scaler, accuracy, step, corr_x, corr_y = get_scaler_variables(triangles, slices)
     triangle_slices_numbers = []
     for i in range(slices):
         tri_slice_numbers = []
@@ -290,11 +308,10 @@ def stl2pngs(triangles, slices=512):
     triangles.clear()
     result = []
     for i in range(slices):
-        array = np.zeros((x_size, y_size), dtype=np.float16)
         z_lvl = step * (i + 0.5) + min_z
         figures = make_figures_from_slice(z_lvl, triangle_slices_numbers[i], accuracy)
-        for fig in figures:
-            array = make_array_from_figure(array, fig, x_size / 2, y_size / 2, x_scaler, y_scaler)
+        sys.stdout.write("\rFigures of slice %i created" % i)
+        array = make_array_from_figures(figures, corr_x, corr_y, x_scaler, y_scaler)
         result.append(array)
         sys.stdout.write("\rSlice %i created" % i)
     print()

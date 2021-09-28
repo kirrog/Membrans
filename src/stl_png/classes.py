@@ -1,3 +1,6 @@
+import sys
+
+
 class vertex:
     x = 0.0
     y = 0.0
@@ -105,10 +108,10 @@ class line:
 
 class figure:
     lines = []
-    x_max = 0.0
-    x_min = 0.0
-    y_max = 0.0
-    y_min = 0.0
+    x_max = -sys.float_info.max
+    x_min = sys.float_info.max
+    y_max = -sys.float_info.max
+    y_min = sys.float_info.max
 
     def __init__(self, linesIn):
         self.lines = linesIn
