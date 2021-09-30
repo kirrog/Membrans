@@ -5,31 +5,20 @@ from natsort import natsorted
 import matplotlib.pyplot as plt
 import numpy as np
 
-# dataset_path = '/content/drive/MyDrive/Membrans/dataset/easy_cases'
-# test_dataset_path = '/content/drive/MyDrive/Membrans/dataset/hard_cases'
-# predict_path = '/content/drive/MyDrive/Membrans/dataset/numpys/predictors.npy'
-# answers_path = '/content/drive/MyDrive/Membrans/dataset/numpys/answers.npy'
-# tests_path = '/content/drive/MyDrive/Membrans/dataset/numpys/test.npy'
-
-dataset_path = '../dataset/easy_cases'
+dataset_path = '../dataset/train_cases'
 test_dataset_path = '../dataset/hard_cases'
 predict_path = '../dataset/numpys/predictors.npy'
 answers_path = '../dataset/numpys/answers.npy'
 tests_path = '../dataset/numpys/test.npy'
-paths_pred_masks = '/*/*_image/*.png'
-paths_answ_masks = '/*/*_mask_bone/*.png'
+paths_pred_masks = '/*/ORIG/*.png'
+paths_answ_masks = '/*/NG/*.png'
 paths_test_masks = '/*/*.png'
 
 img_x, img_y = 512, 512
 
 
 def rgb2green(image):
-    res = np.zeros((image.shape[0], image.shape[1], 1), dtype=np.float16)
-    for i in range(image.shape[0]):
-        for j in range(image.shape[1]):
-            if image[i][j][3] > 0:
-                res[i][j][0] = image[i][j][1]
-    return res
+    return np.multiply(image[:, :, 1], image[:, :, 3])
 
 
 def save_clearer_dataset_tests(numpy_table):

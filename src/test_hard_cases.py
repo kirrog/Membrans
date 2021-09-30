@@ -1,8 +1,5 @@
 from tensorflow import keras
 
-# from clearer.datasets_loader import load_clearer_dataset_tests
-# from clearer.results_transformer import transform_results, check_results
-
 from src.clearer.datasets_loader import load_clearer_dataset_tests
 from src.utils.matrix2png_saver import transform_results, check_results
 
