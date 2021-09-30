@@ -7,7 +7,7 @@ model_path = '../models/clearer/clearer_weights.h5'
 
 activation = 'relu'
 padding = 'same'
-n_filt = 64
+n_filt = 16
 noise = 0.3
 p_drop = 0.4
 kernel_initializer = 'he_normal'

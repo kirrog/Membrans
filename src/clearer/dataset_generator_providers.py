@@ -18,9 +18,9 @@ paths_test_masks = '/*/*.png'
 
 img_x, img_y = 512, 512
 parallel_augment = 3
-batch_size = 3
-autotune = 3
-buffer_size = 30
+batch_size = 9
+autotune = 9
+buffer_size = 21
 
 
 def rgb2green(image):
@@ -30,7 +30,7 @@ def rgb2green(image):
 def clearer_dataset_pair_generator():
     paths_answers = natsorted(glob.glob(dataset_path + paths_answ_masks))
     paths_predicts = natsorted(glob.glob(dataset_path + paths_pred_masks))
-    print("Size of dataset is: " + str(len(paths_predicts)))
+    # print("Size of dataset is: " + str(len(paths_predicts)))
     for path_answer, path_predictor, i in zip(paths_answers, paths_predicts, range(len(paths_answers))):
         answer = rgb2green(plt.imread(path_answer))
         predictor = np.copy(cv2.cvtColor(cv2.imread(path_predictor), cv2.COLOR_RGB2GRAY)) / 255
@@ -46,7 +46,6 @@ def clearer_dataset_pair_augmentation(pred, answ):
         pred = cv2.resize(pred, (img_x, img_y), interpolation=cv2.INTER_CUBIC)
     if answ.shape[0] != img_x or answ.shape[1] != img_y:
         answ = cv2.resize(answ, (img_x, img_y), interpolation=cv2.INTER_CUBIC)
-
     return pred.reshape((img_x, img_y, 1)), answ.reshape((img_x, img_y, 1))
 
 
