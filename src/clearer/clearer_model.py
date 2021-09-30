@@ -1,7 +1,7 @@
+import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras.layers import *
 from tensorflow.keras.models import *
-import tensorflow as tf
 
 model_path = '../models/clearer/clearer_weights.h5'
 
@@ -158,43 +158,13 @@ def clearer_model_new_deep(size=[512, 512]):
 
 def clearer_model_test(size=[512, 512]):
     n_filt = 8
-
     img_rows, img_cols = size[0], size[1]
     input_shape = (img_rows, img_cols, 1)
 
     inputs = Input(input_shape)
     x = GaussianNoise(noise)(inputs)
-
-    deep = 2
-
-    for i in range(deep - 1):
-        x = Conv2D(n_filt * (pow(2, i)), 3, activation=activation, padding=padding,
-                   kernel_initializer=kernel_initializer, activity_regularizer=act_reg)(x)
-        x = Conv2D(n_filt * (pow(2, i)), 3, activation=activation, padding=padding,
-                   kernel_initializer=kernel_initializer, activity_regularizer=act_reg)(x)
-        x = BatchNormalization(axis=channels, activity_regularizer=act_reg)(x)
-        x = MaxPooling2D(pool_size=pool_size)(x)
-        x = Dropout(p_drop)(x)
-
-    x = Conv2D(n_filt * 16, 1, activation=activation, padding=padding,
+    x = Conv2D(n_filt * (pow(2, 1)), 3, activation=activation, padding=padding,
                kernel_initializer=kernel_initializer, activity_regularizer=act_reg)(x)
-    x = Conv2D(n_filt * 16, 1, activation=activation, padding=padding,
-               kernel_initializer=kernel_initializer, activity_regularizer=act_reg)(x)
-    x = Dropout(p_drop)(x)
-
-    for i in range(deep - 1):
-        x = UpSampling2D(size=pool_size)(x)
-        x = Conv2D(n_filt * (pow(2, deep - 2 - i)), 2, activation=activation, padding=padding,
-                   kernel_initializer=kernel_initializer, activity_regularizer=act_reg)(x)
-        x = Conv2D(n_filt * (pow(2, deep - 2 - i)), 3, activation=activation, padding=padding,
-                   kernel_initializer=kernel_initializer, activity_regularizer=act_reg)(x)
-        x = Conv2D(n_filt * (pow(2, deep - 2 - i)), 3, activation=activation, padding=padding,
-                   kernel_initializer=kernel_initializer, activity_regularizer=act_reg)(x)
-        if (i == deep - 2):
-            x = Conv2D(2, 3, activation=activation, padding=padding,
-                       kernel_initializer=kernel_initializer, activity_regularizer=act_reg)(x)
-        x = BatchNormalization(axis=channels, activity_regularizer=act_reg)(x)
-
     x = Conv2D(1, 1, activation='sigmoid')(x)
     model = Model(inputs=inputs, outputs=x)
     model.summary()

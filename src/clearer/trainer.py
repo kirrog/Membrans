@@ -3,7 +3,8 @@ from datetime import datetime
 import numpy as np
 
 from src.clearer.dataset_generator_providers import clearer_dataset_answers_generator, \
-    clearer_dataset_predicts_generator, clearer_dataset_pair
+    clearer_dataset_predicts_generator, clearer_dataset_pair_generator, \
+    clearer_dataset_pair_creater
 from src.clearer.datasets_loader import load_clearer_dataset_predicts, load_clearer_dataset_answers
 from src.utils.augmentations import augment_dataset
 from src.utils.augment_dataset_generator import augment_size, get_augment_dataset
@@ -70,30 +71,9 @@ def train_clearer_model(model):
                   optimizer='adam',
                   metrics=['accuracy'])
 
-    dataset = tf.data.Dataset.from_generator(
-        lambda: next(clearer_dataset_pair()),
-        output_types=np.float32, output_shapes=(batch_size, 512, 512))
-
-    # Splitting the dataset for training and testing.
-    def is_test(x, _):
-        return x % 4 == 0
-
-    def is_train(x, y):
-        return not is_test(x, y)
-
-    recover = lambda x, y: y
-
-    # Split the dataset for training.
-    test_dataset = dataset.enumerate() \
-        .filter(is_test) \
-        .map(recover)
-
-    # Split the dataset for testing/validation.
-    train_dataset = dataset.enumerate() \
-        .filter(is_train) \
-        .map(recover)
+    train_dataset, test_dataset = clearer_dataset_pair_creater()
 
     model.fit(train_dataset, batch_size=batch_size,
-              epochs=epochs, verbose=1,
+              epochs=epochs,
               callbacks=my_callbacks,
               validation_data=test_dataset)
