@@ -10,6 +10,8 @@ from src.utils.augmentations import augment_dataset
 from src.utils.augment_dataset_generator import augment_size, get_augment_dataset
 
 log_dir = '../models/clearer/logs/'
+batch_size = 3
+epochs = 50
 
 
 def load_orig_dataset():
@@ -28,34 +30,6 @@ def get_augment_dataset_size():
     return augment_size
 
 
-def train_clearer_model_augment(model):
-    my_callbacks = [
-        tf.keras.callbacks.EarlyStopping(patience=1, monitor='loss', mode='min', min_delta=1000),
-        tf.keras.callbacks.ModelCheckpoint(
-            filepath=log_dir + 'ep{epoch:03d}.h5',
-            monitor='loss', save_weights_only=True, save_best_only=True, mode='min')
-    ]
-
-    batch_size = 3
-    epochs = 50
-
-    model.compile(loss='binary_crossentropy',
-                  optimizer='adam',
-                  metrics=['accuracy'])
-
-    answers = load_clearer_dataset_answers()
-
-    iters = get_augment_dataset_size()
-
-    for i in range(iters):
-        predictors = get_augment_dataset(i)
-        print('\nUse ' + str(i) + ' dataset to train')
-        model.fit(predictors, answers, batch_size=batch_size,
-                  epochs=epochs, verbose=1,
-                  validation_split=0.1,
-                  callbacks=my_callbacks)
-
-
 def train_clearer_model(model):
     my_callbacks = [
         tf.keras.callbacks.EarlyStopping(patience=10, monitor='loss', mode='min', min_delta=1),
@@ -63,9 +37,6 @@ def train_clearer_model(model):
                                            monitor='loss', mode='min')
     ]
     # -loss{loss:.3f}-val_loss{val_loss:.3f}_' + datetime.now().strftime("%Y%m%d-%H%M%S") + '
-
-    batch_size = 3
-    epochs = 50
 
     model.compile(loss='binary_crossentropy',
                   optimizer='adam',
