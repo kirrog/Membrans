@@ -7,6 +7,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 from natsort import natsorted
 
+from src.utils.augmentations import augment_image, aug_image_by_keras
+
 dataset_path = '../dataset/train_cases'
 test_dataset_path = '../dataset/hard_cases'
 paths_pred_masks = '/*/ORIG/*.png'
@@ -14,7 +16,7 @@ paths_answ_masks = '/*/NG/*.png'
 paths_test_masks = '/*/*.png'
 
 img_x, img_y = 512, 512
-parallel_augment = 3
+parallel_augment = 4
 batch_size = 9
 autotune = 9
 buffer_size = 21
@@ -35,7 +37,7 @@ def clearer_dataset_pair_generator():
 
 
 def transform_from_enum(enum, data):
-    return data[0], data[1]
+    return aug_image_by_keras(data[0]), aug_image_by_keras(data[1])
 
 
 def clearer_dataset_pair_augmentation(pred, answ):

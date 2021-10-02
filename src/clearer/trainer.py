@@ -1,33 +1,20 @@
 import tensorflow as tf
-from datetime import datetime
-import numpy as np
 
-from src.clearer.dataset_generator_providers import clearer_dataset_answers_generator, \
-    clearer_dataset_predicts_generator, clearer_dataset_pair_generator, \
-    clearer_dataset_pair_creater
-from src.clearer.datasets_loader import load_clearer_dataset_predicts, load_clearer_dataset_answers
-from src.utils.augmentations import augment_dataset
-from src.utils.augment_dataset_generator import augment_size, get_augment_dataset
+from src.clearer.dataset_generator_providers import clearer_dataset_pair_creater
 
 log_dir = '../models/clearer/logs/'
 batch_size = 3
 epochs = 50
 
-
-def load_orig_dataset():
-    answers_orig = load_clearer_dataset_answers()
-    predictors_orig = load_clearer_dataset_predicts()
-    return predictors_orig, answers_orig
-
-
-def load_new_augment_dataset():
-    answers_orig = load_clearer_dataset_answers()
-    predictors_orig = load_clearer_dataset_predicts()
-    return augment_dataset(predictors_orig, answers_orig)
-
-
-def get_augment_dataset_size():
-    return augment_size
+optimizer = {
+    "adam": 'adam',
+    "sgd_nesterov": tf.keras.optimizers.SGD(
+        learning_rate=0.01, momentum=0.01, nesterov=True, name="SGD"
+    ),
+    "sgd": tf.keras.optimizers.SGD(
+        learning_rate=0.01, momentum=0.0, nesterov=False, name="SGD"
+    )
+}
 
 
 def train_clearer_model(model):
@@ -39,7 +26,7 @@ def train_clearer_model(model):
     # -loss{loss:.3f}-val_loss{val_loss:.3f}_' + datetime.now().strftime("%Y%m%d-%H%M%S") + '
 
     model.compile(loss='binary_crossentropy',
-                  optimizer='adam',
+                  optimizer=optimizer["sgd_nesterov"],
                   metrics=['accuracy'])
 
     train_dataset, test_dataset = clearer_dataset_pair_creater()
