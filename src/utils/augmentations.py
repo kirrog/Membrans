@@ -18,8 +18,8 @@ def aug_image_by_keras(img):
 
 def aug_transforms():
     return [
-        albu.VerticalFlip(p=0.7),
-        albu.HorizontalFlip(p=0.7),
+        albu.VerticalFlip(),
+        albu.HorizontalFlip(),
         albu.Rotate(limit=180, interpolation=cv2.INTER_LANCZOS4, border_mode=cv2.BORDER_WRAP, always_apply=False,
                     p=0.6),
         albu.ElasticTransform(alpha=10, sigma=50, alpha_affine=28,
@@ -47,13 +47,6 @@ def augment_dataset(images, masks):
     return augmentated_images, augmentated_masks
 
 
-def transform_im_ma(image, mask):
+def augment_image(image, mask):
     res = transforms(image=image, mask=mask)
     return res["image"], res["mask"]
-
-
-def augment_image(image, mask):
-    im, ma = tf.numpy_function(func=transform_im_ma,
-                            inp=[image, mask],
-                            Tout=tf.float32)
-    return im, ma

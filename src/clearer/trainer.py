@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import tensorflow as tf
 
 from src.clearer.dataset_generator_providers import clearer_dataset_pair_creater
@@ -19,9 +21,11 @@ optimizer = {
 
 def train_clearer_model(model):
     my_callbacks = [
-        tf.keras.callbacks.EarlyStopping(patience=10, monitor='loss', mode='min', min_delta=1),
-        tf.keras.callbacks.ModelCheckpoint(filepath=log_dir + 'ep{epoch:03d}.h5',
-                                           monitor='loss', mode='min')
+        tf.keras.callbacks.EarlyStopping(patience=1, monitor='loss', mode='min', min_delta=0.1),
+        tf.keras.callbacks.ModelCheckpoint(
+            filepath=log_dir + 'ep{epoch:03d}-loss{loss:.3f}-val_loss{val_loss:.3f}_' + datetime.now().strftime(
+                "%Y%m%d-%H%M%S") + '.h5',
+            monitor='loss', mode='min')
     ]
     # -loss{loss:.3f}-val_loss{val_loss:.3f}_' + datetime.now().strftime("%Y%m%d-%H%M%S") + '
 
