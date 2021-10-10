@@ -37,7 +37,8 @@ def clearer_dataset_pair_generator():
 
 
 def transform_from_enum(enum, data):
-    return aug_image_by_keras(data[0]), aug_image_by_keras(data[1])
+    # return aug_image_by_keras(data[0]), aug_image_by_keras(data[1])
+    return augment_image(data[0], data[1])
 
 
 def clearer_dataset_pair_augmentation(pred, answ):

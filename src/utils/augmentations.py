@@ -47,5 +47,13 @@ def augment_dataset(images, masks):
     return augmentated_images, augmentated_masks
 
 
+def transform_im_ma(image, mask):
+    res = transforms(image=image, mask=mask)
+    return res["image"], res["mask"]
+
+
 def augment_image(image, mask):
-    return transforms(image=image, mask=mask)
+    res = tf.numpy_function(func=transform_im_ma,
+                            inp=[image, mask],
+                            Tout=tf.float32)
+    return res
