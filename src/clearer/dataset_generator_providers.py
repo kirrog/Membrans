@@ -37,8 +37,7 @@ def clearer_dataset_pair_generator():
 
 
 def transform_from_enum(enum, data):
-    # return aug_image_by_keras(data[0]), aug_image_by_keras(data[1])
-    return augment_image(data[0], data[1])
+    return data[0], data[1]
 
 
 def clearer_dataset_pair_augmentation(pred, answ):
@@ -46,7 +45,10 @@ def clearer_dataset_pair_augmentation(pred, answ):
         pred = cv2.resize(pred, (img_x, img_y), interpolation=cv2.INTER_CUBIC)
     if answ.shape[0] != img_x or answ.shape[1] != img_y:
         answ = cv2.resize(answ, (img_x, img_y), interpolation=cv2.INTER_CUBIC)
-    return pred.reshape((img_x, img_y, 1)), answ.reshape((img_x, img_y, 1))
+    pred, answ = augment_image(pred, answ)
+    # pred = aug_image_by_keras(pred)
+    # answ = aug_image_by_keras(answ)
+    return pred.numpy().reshape((img_x, img_y, 1)), answ.numpy().reshape((img_x, img_y, 1))
 
 
 def clearer_dataset_pair_creater():

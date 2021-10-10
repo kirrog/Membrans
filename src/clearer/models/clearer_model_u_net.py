@@ -19,7 +19,7 @@ ker_reg = tf.keras.regularizers.L1(0.01)
 act_reg = tf.keras.regularizers.L2(0.01)
 
 
-def clearer_model_new(size=[512, 512]):
+def clearer_model_u_net(size=[512, 512]):
     img_rows, img_cols = size[0], size[1]
     input_shape = (img_rows, img_cols, 1)
 

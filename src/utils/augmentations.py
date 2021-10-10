@@ -53,7 +53,7 @@ def transform_im_ma(image, mask):
 
 
 def augment_image(image, mask):
-    res = tf.numpy_function(func=transform_im_ma,
+    im, ma = tf.numpy_function(func=transform_im_ma,
                             inp=[image, mask],
                             Tout=tf.float32)
-    return res
+    return im, ma
