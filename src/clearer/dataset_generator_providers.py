@@ -16,12 +16,10 @@ paths_pred_masks = '/*/ORIG/*.png'
 paths_answ_masks = '/*/NG/*.png'
 paths_test_masks = '/*/*.png'
 
-loaded = False
 img_x, img_y = 512, 512
 parallel_augment = 9
 batch_size = 3
 buffer_size = 30
-autotune = 9
 treads_loader_number = 10
 
 
@@ -48,19 +46,6 @@ class LoadDataWorker(Thread):
                 self.queue_in.task_done()
 
 
-def xor_image_sets(full, deleter):
-    result = np.zeros((len(full), img_x, img_y, 1), dtype=np.float16)
-    queue = Queue()
-    for x in range(treads_number):
-        worker = LoadDataWorker(queue)
-        worker.daemon = True
-        worker.start()
-    for full_image, deleter_image, iter in zip(full, deleter, range(len(full))):
-        queue.put((result, iter, full_image, deleter_image))
-    queue.join()
-    return result
-
-
 def clearer_dataset_pair_generator_parallel():
     paths_answers = natsorted(glob.glob(dataset_path + paths_answ_masks))
     paths_predicts = natsorted(glob.glob(dataset_path + paths_pred_masks))
@@ -76,12 +61,13 @@ def clearer_dataset_pair_generator_parallel():
         pred, answ = queue_out_worker.get()
         queue_out_worker.task_done()
         yield pred, answ
+    queue_in_worker.join()
+    queue_out_worker.join()
 
 
 def clearer_dataset_pair_generator():
     paths_answers = natsorted(glob.glob(dataset_path + paths_answ_masks))
     paths_predicts = natsorted(glob.glob(dataset_path + paths_pred_masks))
-
     for path_answer, path_predictor, i in zip(paths_answers, paths_predicts, range(len(paths_answers))):
         answer = rgb2green(plt.imread(path_answer))
         predictor = np.copy(cv2.cvtColor(cv2.imread(path_predictor), cv2.COLOR_RGB2GRAY)) / 255
@@ -103,7 +89,7 @@ def clearer_dataset_pair_augmentation(pred, answ):
 
 def clearer_dataset_pair_creater():
     dataset = tf.data.Dataset.from_generator(
-        clearer_dataset_pair_generator,
+        clearer_dataset_pair_generator_parallel,
         output_signature=(
             tf.TensorSpec(shape=[512, 512, 1], dtype=tf.float32),
             tf.TensorSpec(shape=[512, 512, 1], dtype=tf.float32)
@@ -111,8 +97,8 @@ def clearer_dataset_pair_creater():
     )
 
     dataset = dataset.shuffle(buffer_size=buffer_size)
-    dataset = dataset.batch(batch_size)
-    dataset = dataset.prefetch(buffer_size=autotune)
+    dataset = dataset.batch(batch_size, num_parallel_calls=batch_size)
+    dataset = dataset.prefetch(buffer_size=buffer_size)
 
     def is_test(x, _):
         return x % 10 == 0
