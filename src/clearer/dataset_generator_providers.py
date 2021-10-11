@@ -1,4 +1,8 @@
 import glob
+import sys
+from queue import Queue
+from threading import Thread
+
 import tensorflow as tf
 import cv2
 import numpy as np
@@ -18,10 +22,60 @@ parallel_augment = 9
 batch_size = 3
 buffer_size = 30
 autotune = 9
+treads_loader_number = 10
 
 
 def rgb2green(image):
     return np.float32(np.multiply(image[:, :, 1], image[:, :, 3]))
+
+
+class LoadDataWorker(Thread):
+
+    def __init__(self, queue_in, queue_out):
+        Thread.__init__(self)
+        self.queue_in = queue_in
+        self.queue_out = queue_out
+
+    def run(self):
+        while True:
+            pred_path, img_path = self.queue_in.get()
+            try:
+                answer = rgb2green(plt.imread(img_path))
+                predictor = np.copy(cv2.cvtColor(cv2.imread(pred_path), cv2.COLOR_RGB2GRAY)) / 255
+                pred, answ = clearer_dataset_pair_augmentation(predictor, answer)
+                self.queue_out.put((pred, answ))
+            finally:
+                self.queue_in.task_done()
+
+
+def xor_image_sets(full, deleter):
+    result = np.zeros((len(full), img_x, img_y, 1), dtype=np.float16)
+    queue = Queue()
+    for x in range(treads_number):
+        worker = LoadDataWorker(queue)
+        worker.daemon = True
+        worker.start()
+    for full_image, deleter_image, iter in zip(full, deleter, range(len(full))):
+        queue.put((result, iter, full_image, deleter_image))
+    queue.join()
+    return result
+
+
+def clearer_dataset_pair_generator_parallel():
+    paths_answers = natsorted(glob.glob(dataset_path + paths_answ_masks))
+    paths_predicts = natsorted(glob.glob(dataset_path + paths_pred_masks))
+    queue_in_worker = Queue()
+    queue_out_worker = Queue(maxsize=buffer_size)
+    for x in range(treads_loader_number):
+        worker = LoadDataWorker(queue_in_worker, queue_out_worker)
+        worker.daemon = True
+        worker.start()
+    for path_answer, path_predictor in zip(paths_answers, paths_predicts):
+        queue_in_worker.put((path_predictor, path_answer))
+    for iterator in range(len(paths_answers)):
+        pred, answ = queue_out_worker.get()
+        queue_out_worker.task_done()
+        yield pred, answ
 
 
 def clearer_dataset_pair_generator():
