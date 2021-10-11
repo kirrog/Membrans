@@ -7,8 +7,8 @@ from threading import Thread
 
 masks_path = '../dataset/results'
 img_x, img_y = 512, 512
-res_path = '../dataset/hard_cases'
-treads_number = 8  # num of cores
+res_path = '../dataset/test_cases'
+treads_number = 10
 
 
 def green2rgb(image):
@@ -143,18 +143,9 @@ def transform_results_gr2rgb(results_g, results_r, dir):
 
 for i in range(5, 9):
     masks = load_masks(i)
-    gener = load_gener(i)
     print('\nData loaded for patient ' + str(i))
-    membr = xor_image_sets(gener, masks)
-    print('\nMembrans masks created for patient ' + str(i))
-    np.save(masks_path + '/membr_' + str(i) + '.npy', membr)
-    print('Saved')
     dir_part = '/{:03d}'.format(i) + '/{:03d}'.format(i)
     print('Saving cleared data for patient ' + str(i))
     transform_results_g2rgb(masks, dir_part + '_mask_bone/')
     print('\nSaving generated data for patient ' + str(i))
-    transform_results_g2rgb(gener, dir_part + '_mask_bone_membr_onecol/')
-    print('\nSaving membran mask data for patient ' + str(i))
-    transform_results_g2rgb(membr, dir_part + '_mask_membr/')
-    print('\nSaving cleared and membran mask data for patient ' + str(i))
-    transform_results_gr2rgb(masks, membr, dir_part + '_mask_bone_membr/')
+

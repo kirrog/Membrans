@@ -6,13 +6,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 dataset_path = '../dataset/train_cases'
-test_dataset_path = '../dataset/hard_cases'
+test_dataset_path = '../dataset/test_cases'
 predict_path = '../dataset/numpys/predictors.npy'
 answers_path = '../dataset/numpys/answers.npy'
 tests_path = '../dataset/numpys/test.npy'
 paths_pred_masks = '/*/ORIG/*.png'
 paths_answ_masks = '/*/NG/*.png'
-paths_test_masks = '/*/*.png'
+paths_test_masks = '/*/*/*.png'
 
 img_x, img_y = 512, 512
 
@@ -109,9 +109,8 @@ def make_clearer_dataset():
 
 
 def load_test_dataset_from_images():
-    dataFold = test_dataset_path
-    paths_predicts = natsorted(glob.glob(dataFold + paths_test_masks))
-
+    paths_predicts = natsorted(glob.glob(test_dataset_path + paths_test_masks))
+    print(len(paths_predicts))
     set_predictors = np.zeros((len(paths_predicts), img_x, img_y, 1), dtype=np.float16)
 
     for path_predictor, i in zip(paths_predicts, range(len(paths_predicts))):
