@@ -122,6 +122,20 @@ def load_test_dataset_from_images():
     return set_predictors
 
 
+def load_test_dataset_from_images_from(path):
+    paths_predicts = natsorted(glob.glob(path + "*.png"))
+    print(len(paths_predicts))
+    set_predictors = np.zeros((len(paths_predicts), img_x, img_y, 1), dtype=np.float16)
+
+    for path_predictor, i in zip(paths_predicts, range(len(paths_predicts))):
+        predictor = cv2.cvtColor(cv2.imread(path_predictor), cv2.COLOR_RGB2GRAY)
+        predictor = cv2.resize(predictor, (512, 512), interpolation=cv2.INTER_CUBIC)
+        set_predictors[i, ..., 0] = np.copy(predictor) / 255
+        sys.stdout.write("\rImage %i loaded" % i)
+
+    return set_predictors
+
+
 def make_test_dataset():
     pred = load_test_dataset_from_images()
     save_clearer_dataset_tests(pred)

@@ -23,14 +23,14 @@ def train_clearer_model(model):
     my_callbacks = [
         tf.keras.callbacks.EarlyStopping(patience=1, monitor='loss', mode='min', min_delta=0.1),
         tf.keras.callbacks.ModelCheckpoint(
-            filepath=log_dir + 'ep{epoch:03d}-loss{loss:.3f}-val_loss{val_loss:.3f}_' + datetime.now().strftime(
+            filepath=log_dir + 'ep{epoch:03d}-loss{loss:.3f}-val_loss{val_loss:.3f}-accuracy{accuracy:.3f}_' + datetime.now().strftime(
                 "%Y%m%d-%H%M%S") + '.h5',
             monitor='loss', mode='min')
     ]
     # -loss{loss:.3f}-val_loss{val_loss:.3f}_' + datetime.now().strftime("%Y%m%d-%H%M%S") + '
 
     model.compile(loss='binary_crossentropy',
-                  optimizer=optimizer["sgd_nesterov"],
+                  optimizer=optimizer["adam"],
                   metrics=['accuracy'])
 
     train_dataset, test_dataset = clearer_dataset_pair_creater()
