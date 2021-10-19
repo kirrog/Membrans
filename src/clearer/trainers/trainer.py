@@ -2,7 +2,7 @@ from datetime import datetime
 
 import tensorflow as tf
 
-from src.clearer.dataset_generator_providers import clearer_dataset_pair_creater
+from src.clearer.dataset_genearators.dataset_generator_providers import clearer_dataset_pair_creater
 
 log_dir = '../models/clearer/logs/'
 batch_size = 3
