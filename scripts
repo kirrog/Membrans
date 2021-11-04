@@ -1,0 +1,5 @@
+pip freeze > requirements.txt
+python -V
+python3 -m venv ~/*/Membrans/.venv/
+source .venv/bin/activate
+pip install -r requirements.txt
