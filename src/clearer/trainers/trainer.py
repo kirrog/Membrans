@@ -2,6 +2,8 @@ from datetime import datetime
 
 import tensorflow as tf
 
+from src.utils.config_loader import train_data
+from src.utils.config_loader import test_data
 from src.clearer.dataset_genearators.dataset_generator_providers import clearer_dataset_pair_creater
 
 log_dir = '../models/clearer/logs/'
@@ -33,7 +35,8 @@ def train_clearer_model(model):
                   optimizer=optimizer["adam"],
                   metrics=['accuracy'])
 
-    train_dataset, test_dataset = clearer_dataset_pair_creater()
+    train_dataset = clearer_dataset_pair_creater(train_data)
+    test_dataset = clearer_dataset_pair_creater(test_data)
 
     model.fit(train_dataset, batch_size=batch_size,
               epochs=epochs,

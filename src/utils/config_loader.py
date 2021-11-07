@@ -1,4 +1,4 @@
-config_path = '../../config.config'
+config_path = '../config.config'
 
 with open(config_path) as f:
     lines = list(f)
@@ -19,4 +19,3 @@ with open(config_path) as f:
     one_test_data_dir = dictionary['one_test_data_dir']
     output_data_dir = dictionary['output_data_dir']
     output_model_dir = dictionary['output_model_dir']
-
