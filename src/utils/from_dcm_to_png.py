@@ -4,17 +4,14 @@ import sys
 import numpy as np
 import pydicom as dicom
 import cv2
-from pathlib import Path
-
-
-# result_path = '/content/drive/MyDrive/Membrans/dataset/new/'
 from natsort import natsorted
 
 result_path = '../dataset/new/'
 
+
 def from_dcm_to_png(directory):
-    paths_predicts = natsorted(glob.glob(directory + '\\*.dcm'))
-    for file,iter in zip(paths_predicts, range(1, len(paths_predicts) + 1)):
+    paths_predicts = natsorted(glob.glob(directory + '*.dcm'))
+    for file, iter in zip(paths_predicts, range(1, len(paths_predicts) + 1)):
         read_write_file(file, '{:03}'.format(iter))
 
 
@@ -22,7 +19,7 @@ def read_write_file(file_path, iter):
     ds = dicom.dcmread(file_path)
 
     image_2d = ds.pixel_array.astype(float)
-    image_2d_scaled = (np.maximum(image_2d,0) / image_2d.max()) * 255.0
+    image_2d_scaled = (np.maximum(image_2d, 0) / image_2d.max()) * 255.0
     image_2d_scaled = np.uint8(image_2d_scaled)
 
     image_format = '.png'
