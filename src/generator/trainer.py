@@ -4,7 +4,7 @@ from datetime import datetime
 # from clearer.datasets_loader import load_clearer_dataset_predicts, load_clearer_dataset_answers
 # from utils.augmentations import augment_dataset
 # from utils.augment_dataset_generator import augment_size, get_augment_dataset
-from src.generator.dataset_generator_providers import generator_dataset_pair_creater
+from src.generator.dataset_generator_providers_old import generator_dataset_pair_creater
 from src.generator.datasets_loader import load_generator_dataset_predicts, load_generator_dataset_answers
 from src.utils.augmentations import augment_dataset
 from src.utils.augment_dataset_generator import augment_size, get_augment_dataset

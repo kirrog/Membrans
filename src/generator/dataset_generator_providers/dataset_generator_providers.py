@@ -33,8 +33,9 @@ def read_csv(path):
     res = np.zeros((32, 1), dtype=tf.float32)
     with open(path) as f:
         res_s = f.read()
-        res_strs = res_s.split(' ')
+        res_strs = res_s.split(',')
         for i in res_strs:
+            i = int(i)
             part = i / 10
             n = i % 10
             res[(part - 1) * 8 + n, 0] = 1
