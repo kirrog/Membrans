@@ -30,7 +30,7 @@ def rgb2red(image):
 
 
 def read_csv(path):
-    res = np.zeros((32, 1), dtype=tf.float32)
+    res = np.zeros((512, 1), dtype=tf.float32)
     with open(path) as f:
         res_s = f.read()
         res_strs = res_s.split(',')
@@ -64,7 +64,10 @@ class LoadDataWorker(Thread):
 
                 pred, answ = augment_image(predictor, answer)
                 pred, answ = generator_dataset_pair_augmentation(pred, answ)
-                self.queue_out.put((pred, answ, num))
+
+                pred = np.concatenate((pred, num), axis=1)
+
+                self.queue_out.put((pred, answ))
             finally:
                 self.queue_in.task_done()
 
@@ -93,7 +96,7 @@ def generator_dataset_pair_generator_parallel_getter(dataset_path):
 
 
 def transform_from_enum(enum, data):
-    return data[0], data[1], data[2]
+    return data[0], data[1]
 
 
 def generator_dataset_pair_augmentation(pred, answ):
@@ -109,9 +112,9 @@ def generator_dataset_pair_creater(data_path):
     dataset = tf.data.Dataset.from_generator(
         generator_dataset_pair_generator_parallel_getter(data_path),
         output_signature=(
+            tf.TensorSpec(shape=[512, 513, 1], dtype=tf.float32),
             tf.TensorSpec(shape=[512, 512, 1], dtype=tf.float32),
-            tf.TensorSpec(shape=[512, 512, 1], dtype=tf.float32),
-            tf.TensorSpec(shape=[32, 1], dtype=tf.float32)
+            # tf.TensorSpec(shape=[32, 1], dtype=tf.float32)
         )
     )
 

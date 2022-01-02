@@ -1,15 +1,10 @@
 import tensorflow as tf
 from datetime import datetime
 
-# from clearer.datasets_loader import load_clearer_dataset_predicts, load_clearer_dataset_answers
-# from utils.augmentations import augment_dataset
-# from utils.augment_dataset_generator import augment_size, get_augment_dataset
-from src.generator.dataset_generator_providers_old import generator_dataset_pair_creater
-from src.generator.datasets_loader import load_generator_dataset_predicts, load_generator_dataset_answers
-from src.utils.augmentations import augment_dataset
-from src.utils.augment_dataset_generator import augment_size, get_augment_dataset
-
-# log_dir = '/content/drive/MyDrive/Membrans/models/generator/logs/'
+from src.generator.dataset_generator_providers.dataset_generator_providers import generator_dataset_pair_creater
+from src.utils.config_loader import train_data
+from src.utils.config_loader import test_data
+from src.clearer.dataset_genearators.dataset_generator_providers import clearer_dataset_pair_creater
 
 log_dir = '../models/generator/logs/'
 
@@ -31,7 +26,8 @@ def train_generator_model(model):
                   optimizer='adam',
                   metrics=['accuracy'])
 
-    train_dataset, test_dataset = generator_dataset_pair_creater()
+    train_dataset = generator_dataset_pair_creater(train_data)
+    test_dataset = generator_dataset_pair_creater(test_data)
 
     model.fit(train_dataset, batch_size=batch_size,
               epochs=epochs,
