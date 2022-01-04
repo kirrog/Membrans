@@ -1,11 +1,6 @@
 
 import numpy as np
 
-# predict_path = '/content/drive/MyDrive/Membrans/dataset/numpys/generator/predictors.npy'
-# answers_path = '/content/drive/MyDrive/Membrans/dataset/numpys/generator/answers.npy'
-# tests_path = '/content/drive/MyDrive/Membrans/dataset/numpys/generator/test.npy'
-
-
 predict_path = '../dataset/numpys/generator/predictors.npy'
 answers_path = '../dataset/numpys/generator/answers.npy'
 tests_path = '../dataset/numpys/generator/test.npy'

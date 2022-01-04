@@ -51,11 +51,10 @@ class LoadDataWorker(Thread):
 
     def run(self):
         while True:
-            pred_path, img_path, num_path = self.queue_in.get()
+            pred_path, img_path, num = self.queue_in.get()
             try:
                 answer = rgb2green(plt.imread(img_path))
                 predictor = rgb2green(plt.imread(pred_path))
-                num = read_csv(num_path)
 
                 if answer.shape[0] != img_x or answer.shape[1] != img_y:
                     answer = cv2.resize(answer, (img_x, img_y), interpolation=cv2.INTER_CUBIC)
@@ -65,11 +64,23 @@ class LoadDataWorker(Thread):
                 pred, answ = augment_image(predictor, answer)
                 pred, answ = generator_dataset_pair_augmentation(pred, answ)
 
-                pred = np.concatenate((pred, num), axis=1)
-
-                self.queue_out.put((pred, answ))
+                self.queue_out.put((pred, answ, num))
             finally:
                 self.queue_in.task_done()
+
+
+def get_numbers_from_files(paths_numbers):
+    data = []
+    for i in paths_numbers:
+        data.append(read_csv(i))
+    return data
+
+
+def get_dirs(paths):
+    data = []
+    for i in paths:
+        dirs = i.split('/')
+        data.append(dirs[len(dirs) - 2])
 
 
 def generator_dataset_pair_generator_parallel_getter(dataset_path):
@@ -77,17 +88,22 @@ def generator_dataset_pair_generator_parallel_getter(dataset_path):
         paths_answers = natsorted(glob.glob(dataset_path + paths_answ_masks))
         paths_predicts = natsorted(glob.glob(dataset_path + paths_pred_masks))
         paths_numbers = natsorted(glob.glob(dataset_path + paths_pred_numbers))
+        numbers_data = get_numbers_from_files(paths_numbers)
         queue_in_worker = Queue()
         queue_out_worker = Queue(maxsize=buffer_size)
         for x in range(treads_loader_number):
             worker = LoadDataWorker(queue_in_worker, queue_out_worker)
             worker.daemon = True
             worker.start()
-        for path_answer, path_predictor, paths_number in zip(paths_answers, paths_predicts, paths_numbers):
-            queue_in_worker.put((path_predictor, path_answer, paths_number))
+        numbers_dir = get_dirs(paths_numbers)
+        for path_answer, path_predictor in zip(paths_answers, paths_predicts):
+            dirs = path_answer.split('/')
+            num = numbers_dir.index(dirs[len(dirs) - 2])
+            queue_in_worker.put((path_predictor, path_answer, num))
         for iterator in range(len(paths_answers)):
-            pred, answ = queue_out_worker.get()
+            pred, answ, num = queue_out_worker.get()
             queue_out_worker.task_done()
+            pred = np.concatenate((pred, numbers_data[num]), axis=1)
             yield pred, answ
         queue_in_worker.join()
         queue_out_worker.join()
