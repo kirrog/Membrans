@@ -14,6 +14,7 @@ from src.utils.augmentations import augment_image
 
 paths_pred_masks = '*/NG/*.png'
 paths_answ_masks = '*/RG/*.png'
+# paths_answ_masks = '*/R/*.png'
 paths_pred_numbers = '/numbers.csv'
 
 img_x, img_y = 512, 512
@@ -55,7 +56,7 @@ class LoadDataWorker(Thread):
         while True:
             pred_path, img_path = self.queue_in.get()
             try:
-                answer = rgb2green(plt.imread(img_path))
+                answer = rgb2red(plt.imread(img_path))
                 predictor = rgb2green(plt.imread(pred_path))
 
                 num = read_csv("/" + "/".join(str(pred_path).split('/')[:-2]) + paths_pred_numbers)
