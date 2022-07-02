@@ -4,7 +4,7 @@ from datetime import datetime
 from src.generator.dataset_generator_providers.dataset_generator_providers import generator_dataset_pair_creater
 from src.utils.config_loader import train_data
 from src.utils.config_loader import test_data
-from src.clearer.dataset_genearators.dataset_generator_providers import clearer_dataset_pair_creater
+from src.clearer.dataset_generators.dataset_generator_providers import clearer_dataset_pair_creater
 
 log_dir = '../models/generator/logs/'
 

@@ -8,11 +8,13 @@ import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 from natsort import natsorted
+from tqdm import tqdm
+
 from src.utils.augmentations import augment_image
 
 paths_pred_masks = '*/NG/*.png'
 paths_answ_masks = '*/RG/*.png'
-paths_pred_numbers = '*/numbers.csv'
+paths_pred_numbers = '/numbers.csv'
 
 img_x, img_y = 512, 512
 parallel_augment = 9
@@ -30,15 +32,15 @@ def rgb2red(image):
 
 
 def read_csv(path):
-    res = np.zeros((512, 1), dtype=tf.float32)
+    res = np.zeros((1, 512, 1), dtype=float)
     with open(path) as f:
         res_s = f.read()
         res_strs = res_s.split(',')
         for i in res_strs:
             i = int(i)
-            part = i / 10
+            part = int(i / 10)
             n = i % 10
-            res[(part - 1) * 8 + n, 0] = 1
+            res[0, (part - 1) * 8 + n, 0] = 1
     return res
 
 
@@ -51,11 +53,12 @@ class LoadDataWorker(Thread):
 
     def run(self):
         while True:
-            pred_path, img_path, num_path = self.queue_in.get()
+            pred_path, img_path = self.queue_in.get()
             try:
                 answer = rgb2green(plt.imread(img_path))
                 predictor = rgb2green(plt.imread(pred_path))
-                num = read_csv(num_path)
+
+                num = read_csv("/" + "/".join(str(pred_path).split('/')[:-2]) + paths_pred_numbers)
 
                 if answer.shape[0] != img_x or answer.shape[1] != img_y:
                     answer = cv2.resize(answer, (img_x, img_y), interpolation=cv2.INTER_CUBIC)
@@ -65,7 +68,7 @@ class LoadDataWorker(Thread):
                 pred, answ = augment_image(predictor, answer)
                 pred, answ = generator_dataset_pair_augmentation(pred, answ)
 
-                pred = np.concatenate((pred, num), axis=1)
+                pred = np.concatenate((pred, num), axis=0)
 
                 self.queue_out.put((pred, answ))
             finally:
@@ -76,15 +79,14 @@ def generator_dataset_pair_generator_parallel_getter(dataset_path):
     def generator_dataset_pair_generator_parallel():
         paths_answers = natsorted(glob.glob(dataset_path + paths_answ_masks))
         paths_predicts = natsorted(glob.glob(dataset_path + paths_pred_masks))
-        paths_numbers = natsorted(glob.glob(dataset_path + paths_pred_numbers))
         queue_in_worker = Queue()
         queue_out_worker = Queue(maxsize=buffer_size)
         for x in range(treads_loader_number):
             worker = LoadDataWorker(queue_in_worker, queue_out_worker)
             worker.daemon = True
             worker.start()
-        for path_answer, path_predictor, paths_number in zip(paths_answers, paths_predicts, paths_numbers):
-            queue_in_worker.put((path_predictor, path_answer, paths_number))
+        for path_answer, path_predictor in tqdm(zip(paths_answers, paths_predicts)):
+            queue_in_worker.put((path_predictor, path_answer))
         for iterator in range(len(paths_answers)):
             pred, answ = queue_out_worker.get()
             queue_out_worker.task_done()
@@ -112,7 +114,7 @@ def generator_dataset_pair_creater(data_path):
     dataset = tf.data.Dataset.from_generator(
         generator_dataset_pair_generator_parallel_getter(data_path),
         output_signature=(
-            tf.TensorSpec(shape=[512, 513, 1], dtype=tf.float32),
+            tf.TensorSpec(shape=[513, 512, 1], dtype=tf.float32),
             tf.TensorSpec(shape=[512, 512, 1], dtype=tf.float32),
             # tf.TensorSpec(shape=[32, 1], dtype=tf.float32)
         )

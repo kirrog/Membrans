@@ -1,0 +1,13 @@
+{
+  "threads_loading": 10,
+  "cache": 30,
+  "batch_size": 3,
+  "model_path": "/home/kirrog/Documents/projects/Membrans/models/generator/logs/generator_weights.h5",
+  "model_path_logs": "../models/clearer/logs/r2u_net/ep002-loss0.095-val_loss0.132-accuracy0.955_20211019-183449.h5",
+  "train_data": "/media/kirrog/workdata/membransdata/train/",
+  "test_data": "/media/kirrog/workdata/membransdata/test/",
+  "valid_data": "/media/kirrog/workdata/membransdata/valid/",
+  "one_test_data_dir": "/media/kirrog/workdata/membransdata/valid/010",
+  "output_data_dir": "../dataset/results/",
+  "output_model_dir": "../models/new/clearer_weights.h5"
+}

@@ -7,8 +7,7 @@ model_path = '../models/generator/generator_weights.h5'
 
 
 def get_attention_on_tooth(y, cross_data):
-    y = y[:, 0:32, :]
-    print(y)
+    y = y[:, :32, :]
     y = Dense(units=32, activation='relu')(y)
     y = Reshape((32, 32, 1))(y)
     for i in range(len(cross_data)):

@@ -1,13 +1,8 @@
-config_path = '../config.config'
+import json
+config_path = '../config.json'
 
 with open(config_path) as f:
-    lines = list(f)
-    dict_key_word = []
-    for line in lines:
-        key, word = line.strip().split('=')
-        print(str(key) + ': ' + str(word))
-        dict_key_word.append((key, word))
-    dictionary = dict(dict_key_word)
+    dictionary = json.load(f)
     threads_loading = int(dictionary['threads_loading'])
     cache = int(dictionary['cache'])
     batch_size = int(dictionary['batch_size'])
