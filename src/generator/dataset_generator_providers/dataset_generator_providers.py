@@ -56,18 +56,24 @@ class LoadDataWorker(Thread):
         while True:
             pred_path, img_path = self.queue_in.get()
             try:
-                answer = rgb2red(plt.imread(img_path))
+                a_image = plt.imread(img_path)
+                answer = np.zeros((a_image.shape[0], a_image.shape[1], 2))
+                answer[:, :, 0] = rgb2red(a_image)
+                answer[:, :, 1] = rgb2green(a_image)
                 predictor = rgb2green(plt.imread(pred_path))
 
                 num = read_csv("/" + "/".join(str(pred_path).split('/')[:-2]) + paths_pred_numbers)
 
+                answer_r = np.zeros((img_x, img_y, 2))
+
                 if answer.shape[0] != img_x or answer.shape[1] != img_y:
-                    answer = cv2.resize(answer, (img_x, img_y), interpolation=cv2.INTER_CUBIC)
+                    answer_r[:, :, 0] = cv2.resize(answer[:, :, 0], (img_x, img_y), interpolation=cv2.INTER_CUBIC)
+                    answer_r[:, :, 1] = cv2.resize(answer[:, :, 1], (img_x, img_y), interpolation=cv2.INTER_CUBIC)
                 if predictor.shape[0] != img_x or predictor.shape[1] != img_y:
                     predictor = cv2.resize(predictor, (img_x, img_y), interpolation=cv2.INTER_CUBIC)
 
-                pred, answ = augment_image(predictor, answer)
-                pred, answ = generator_dataset_pair_augmentation(pred, answ)
+                pred, answ = augment_image(predictor, answer_r)
+                pred, answ = pred.reshape((img_x, img_y, 1)), answ.reshape((img_x, img_y, 2))
 
                 pred = np.concatenate((pred, num), axis=0)
 
@@ -102,21 +108,12 @@ def transform_from_enum(enum, data):
     return data[0], data[1]
 
 
-def generator_dataset_pair_augmentation(pred, answ):
-    if pred.shape[0] != img_x or pred.shape[1] != img_y:
-        pred = cv2.resize(pred, (img_x, img_y), interpolation=cv2.INTER_CUBIC)
-    if answ.shape[0] != img_x or answ.shape[1] != img_y:
-        answ = cv2.resize(answ, (img_x, img_y), interpolation=cv2.INTER_CUBIC)
-    pred, answ = augment_image(pred, answ)
-    return pred.reshape((img_x, img_y, 1)), answ.reshape((img_x, img_y, 1))
-
-
 def generator_dataset_pair_creater(data_path):
     dataset = tf.data.Dataset.from_generator(
         generator_dataset_pair_generator_parallel_getter(data_path),
         output_signature=(
             tf.TensorSpec(shape=[513, 512, 1], dtype=tf.float32),
-            tf.TensorSpec(shape=[512, 512, 1], dtype=tf.float32),
+            tf.TensorSpec(shape=[512, 512, 2], dtype=tf.float32),
             # tf.TensorSpec(shape=[32, 1], dtype=tf.float32)
         )
     )

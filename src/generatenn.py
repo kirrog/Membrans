@@ -66,8 +66,8 @@ results = model.predict(x=data, batch_size=batch_size)
 def from_dcm_to_png(directory, data):
     for iter in range(data.shape[0]):
         d = np.zeros((data.shape[1], data.shape[2], 3))
-        # d[:, :, 0] = data[iter, :, :, 0]
-        d[:, :, 1] = data[iter, :, :, 0]
+        d[:, :, 0] = data[iter, :, :, 0]
+        d[:, :, 1] = data[iter, :, :, 1]
         # d[:, :, 2] = data[iter, :, :, 0]
         plt.imsave(directory + f"/{iter:04d}.png", d)
         sys.stdout.write("\rImage %i written" % iter)

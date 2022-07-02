@@ -67,7 +67,7 @@ def generator_model_u_net(size=[512, 512, 32]):
                    kernel_initializer=kernel_initializer)(x)
         x = BatchNormalization(axis=channels)(x)
 
-    x = Conv2D(1, 1, activation='sigmoid')(x)
+    x = Conv2D(2, 1, activation='sigmoid')(x)
 
     return Model(inputs=inputs, outputs=x)
 
