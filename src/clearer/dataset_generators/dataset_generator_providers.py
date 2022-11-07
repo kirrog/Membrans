@@ -8,7 +8,31 @@ import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 from natsort import natsorted
-from src.utils.augmentations import augment_image
+import albumentations as albu
+
+
+def aug_transforms():
+    return [
+        albu.VerticalFlip(),
+        albu.HorizontalFlip(),
+        albu.Rotate(limit=180, interpolation=cv2.INTER_LANCZOS4, border_mode=cv2.BORDER_WRAP, always_apply=False,
+                    p=0.6),
+        albu.ElasticTransform(alpha=10, sigma=50, alpha_affine=28,
+                              interpolation=cv2.INTER_LANCZOS4, border_mode=cv2.BORDER_WRAP,
+                              always_apply=False, approximate=False, p=0.6),
+        albu.GridDistortion(num_steps=20, distort_limit=0.2, interpolation=cv2.INTER_LANCZOS4,
+                            border_mode=cv2.BORDER_WRAP,
+                            always_apply=False, p=0.5)
+    ]
+
+
+transforms = albu.Compose(aug_transforms())
+
+
+def augment_image(image, mask):
+    res = transforms(image=image, mask=mask)
+    return res["image"], res["mask"]
+
 
 paths_pred_masks = '*/ORIG/*.png'
 paths_answ_masks = '*/NG/*.png'
@@ -68,6 +92,7 @@ def clearer_dataset_pair_generator_parallel_getter(dataset_path):
             yield pred, answ
         queue_in_worker.join()
         queue_out_worker.join()
+
     return clearer_dataset_pair_generator_parallel
 
 
