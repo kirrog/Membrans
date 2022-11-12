@@ -5,14 +5,14 @@ from threading import Thread
 import numpy as np
 import matplotlib.pyplot as plt
 
-res_path = '../dataset/results/'
+res_path = '../../dataset/new/'
 treads_number = 10
 
 
 def green2rgb(image):
     res = np.zeros((image.shape[0], image.shape[1], 3))
     image[image < 0.05] = 0
-    res[:, :, 1] = image[:, :, 0]
+    res[:, :, 1] = image
     return res
 
 
@@ -51,3 +51,21 @@ def transform_results(results, dir):
     for image, i in zip(results, range(len(results))):
         queue.put((image, dir, i))
     queue.join()
+
+
+def transform_results_from_matrix(dir="b/"):
+    results = np.load("/home/kirrog/Documents/projects/Membrans/pvlv/numpy/pvlvB.npy")
+    queue = Queue()
+    w = []
+    for x in range(treads_number):
+        worker = G2RGBTransformWorker(queue)
+        worker.daemon = True
+        worker.start()
+        w.append(w)
+    for i in range(results.shape[0]):
+        queue.put((results[i, :, :], dir, i))
+    queue.join()
+    for worker in w:
+        worker.join()
+
+transform_results_from_matrix()

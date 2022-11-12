@@ -1,5 +1,5 @@
 import json
-config_path = '../config.json'
+config_path = 'config.json'
 
 with open(config_path) as f:
     dictionary = json.load(f)
