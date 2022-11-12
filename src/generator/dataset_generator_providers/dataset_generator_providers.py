@@ -1,22 +1,21 @@
 import glob
-import sys
 from queue import Queue
 from threading import Thread
 
-import tensorflow as tf
 import cv2
 import numpy as np
+import tensorflow as tf
 from matplotlib import pyplot as plt
-from natsort import natsorted
+
 from src.utils.augmentations import augment_image
 
-paths_pred_masks = '*/ORIG/*.png'
+paths_pred_masks = '*/G/*.png'
 paths_answ_masks = '*/R/*.png'
 
 img_x, img_y = 512, 512
 parallel_augment = 9
-batch_size = 3
-buffer_size = 30
+batch_size = 30
+buffer_size = 600
 treads_loader_number = 10
 
 
@@ -37,14 +36,7 @@ class LoadDataWorker(Thread):
             try:
                 answer = rgb2green(plt.imread(img_path))
                 predictor = np.copy(cv2.cvtColor(cv2.imread(pred_path), cv2.COLOR_RGB2GRAY)) / 255
-
-                if answer.shape[0] != img_x or answer.shape[1] != img_y:
-                    answer = cv2.resize(answer, (img_x, img_y), interpolation=cv2.INTER_CUBIC)
-                if predictor.shape[0] != img_x or predictor.shape[1] != img_y:
-                    predictor = cv2.resize(predictor, (img_x, img_y), interpolation=cv2.INTER_CUBIC)
-
-                pred, answ = augment_image(predictor, answer)
-                pred, answ = clearer_dataset_pair_augmentation(pred, answ)
+                pred, answ = clearer_dataset_pair_augmentation(predictor, answer)
                 self.queue_out.put((pred, answ))
             finally:
                 self.queue_in.task_done()
@@ -52,8 +44,8 @@ class LoadDataWorker(Thread):
 
 def clearer_dataset_pair_generator_parallel_getter(dataset_path):
     def clearer_dataset_pair_generator_parallel():
-        paths_answers = natsorted(glob.glob(dataset_path + paths_answ_masks))
-        paths_predicts = natsorted(glob.glob(dataset_path + paths_pred_masks))
+        paths_answers = list(sorted(glob.glob(dataset_path + paths_answ_masks)))
+        paths_predicts = list(sorted(glob.glob(dataset_path + paths_pred_masks)))
         queue_in_worker = Queue()
         queue_out_worker = Queue(maxsize=buffer_size)
         for x in range(treads_loader_number):
@@ -68,6 +60,7 @@ def clearer_dataset_pair_generator_parallel_getter(dataset_path):
             yield pred, answ
         queue_in_worker.join()
         queue_out_worker.join()
+
     return clearer_dataset_pair_generator_parallel
 
 
@@ -76,28 +69,46 @@ def transform_from_enum(enum, data):
 
 
 def clearer_dataset_pair_augmentation(pred, answ):
+    pred, answ = augment_image(pred, answ)
     if pred.shape[0] != img_x or pred.shape[1] != img_y:
         pred = cv2.resize(pred, (img_x, img_y), interpolation=cv2.INTER_CUBIC)
     if answ.shape[0] != img_x or answ.shape[1] != img_y:
         answ = cv2.resize(answ, (img_x, img_y), interpolation=cv2.INTER_CUBIC)
-    pred, answ = augment_image(pred, answ)
     return pred.reshape((img_x, img_y, 1)), answ.reshape((img_x, img_y, 1))
 
 
-def clearer_dataset_pair_creater(data_path):
+def generator_dataset_pair_creater(data_path):
     dataset = tf.data.Dataset.from_generator(
         clearer_dataset_pair_generator_parallel_getter(data_path),
         output_signature=(
-            tf.TensorSpec(shape=[512, 512, 1], dtype=tf.float32),
-            tf.TensorSpec(shape=[512, 512, 1], dtype=tf.float32)
+            tf.TensorSpec(shape=[img_x, img_y, 1], dtype=tf.float32),
+            tf.TensorSpec(shape=[img_x, img_y, 1], dtype=tf.float32)
+        )
+    )
+
+    dataset = dataset.batch(batch_size, num_parallel_calls=batch_size)
+    dataset = dataset.prefetch(buffer_size=buffer_size)
+    dataset = dataset.enumerate() \
+        .map(transform_from_enum)
+    print(dataset)
+    return dataset
+
+
+def debug_dataset_pair_creater(data_path):
+    def generator_function():
+        for i in range(100):
+            yield np.random.random((512, 512, 1)), np.random.random((512, 512, 1))
+
+    dataset = tf.data.Dataset.from_generator(
+        generator_function,
+        output_signature=(
+            tf.TensorSpec(shape=[img_x, img_y, 1], dtype=tf.float32),
+            tf.TensorSpec(shape=[img_x, img_y, 1], dtype=tf.float32)
         )
     )
 
     # dataset = dataset.shuffle(buffer_size=buffer_size)
     dataset = dataset.batch(batch_size, num_parallel_calls=batch_size)
     dataset = dataset.prefetch(buffer_size=buffer_size)
-
-    dataset = dataset.enumerate() \
-        .map(transform_from_enum, num_parallel_calls=parallel_augment)
 
     return dataset

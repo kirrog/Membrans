@@ -1,10 +1,11 @@
-import tensorflow as tf
 from datetime import datetime
 
-from src.generator.dataset_generator_providers.dataset_generator_providers import generator_dataset_pair_creater
-from src.utils.config_loader import train_data
+import tensorflow as tf
+
+from src.generator.dataset_generator_providers.dataset_generator_providers import generator_dataset_pair_creater, \
+    debug_dataset_pair_creater
 from src.utils.config_loader import test_data
-from src.clearer.dataset_generators.dataset_generator_providers import clearer_dataset_pair_creater
+from src.utils.config_loader import train_data
 
 log_dir = '../models/generator/logs/'
 
@@ -25,6 +26,7 @@ def train_generator_model(model):
     model.compile(loss='binary_crossentropy',
                   optimizer='adam',
                   metrics=['accuracy'])
+    model.summary()
 
     train_dataset = generator_dataset_pair_creater(train_data)
     test_dataset = generator_dataset_pair_creater(test_data)

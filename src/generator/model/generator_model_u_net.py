@@ -19,7 +19,7 @@ def get_attention_on_tooth(y, cross_data):
     return y
 
 
-def generator_model_u_net(size=[512, 512, 32]):
+def generator_model_u_net():
     activation = 'relu'
     padding = 'same'
     n_filt = 32
@@ -31,16 +31,16 @@ def generator_model_u_net(size=[512, 512, 32]):
 
     num_of_slices_in_crater = 4
 
-    img_rows, img_cols = size[0] + 1, size[1]
+    img_rows, img_cols = 512, 512
     input_shape = (img_rows, img_cols, 1)
 
     inputs = Input(input_shape)
-    inputs_y = inputs[:, img_rows - 1, :, :]
-    inputs_x = inputs[:, :img_rows - 1, :, :]
+    # inputs_y = inputs[:, img_rows - 1, :, :]
+    # inputs_x = inputs[:, :img_rows - 1, :, :]
 
-    x = GaussianNoise(noise)(inputs_x)  # may be deleted
+    x = GaussianNoise(noise)(inputs)  # may be deleted
 
-    cross_data = []
+    # cross_data = []
 
     for i in range(num_of_slices_in_crater):
         x = Conv2D(n_filt * pow(2, i), 3, activation=activation, padding=padding,
@@ -48,13 +48,13 @@ def generator_model_u_net(size=[512, 512, 32]):
         x = Conv2D(n_filt * pow(2, i), 3, activation=activation, padding=padding,
                    kernel_initializer=kernel_initializer)(x)
         x = BatchNormalization(axis=channels)(x)
-        cross_data.append(x)
+        # cross_data.append(x)
         x = MaxPooling2D(pool_size=pool_size)(x)
         x = Dropout(p_drop)(x)
 
-    inputs_y = get_attention_on_tooth(inputs_y, cross_data)
+    # inputs_y = get_attention_on_tooth(inputs_y, cross_data)
 
-    x = Multiply()([x, inputs_y])
+    # x = Multiply()([x, inputs_y])
     x = Conv2D(n_filt * pow(2, num_of_slices_in_crater), 1, activation=activation, padding=padding,
                kernel_initializer=kernel_initializer)(x)
     x = Dropout(p_drop)(x)
@@ -67,7 +67,8 @@ def generator_model_u_net(size=[512, 512, 32]):
                    kernel_initializer=kernel_initializer)(x)
         x = BatchNormalization(axis=channels)(x)
 
-    x = Conv2D(2, 1, activation='sigmoid')(x)
+    # x = Conv2D(2, 1, activation='sigmoid')(x)
+    x = Conv2D(1, 1, activation='sigmoid')(x)
 
     return Model(inputs=inputs, outputs=x)
 

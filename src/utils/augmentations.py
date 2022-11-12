@@ -6,14 +6,14 @@ import tensorflow as tf
 
 from keras import layers
 
-data_augmentation = tf.keras.Sequential([
-    layers.experimental.preprocessing.RandomFlip("horizontal_and_vertical"),
-    layers.experimental.preprocessing.RandomRotation(0.2),
-])
+# data_augmentation = tf.keras.Sequential([
+#     layers.experimental.preprocessing.RandomFlip("horizontal_and_vertical"),
+#     layers.experimental.preprocessing.RandomRotation(0.2),
+# ])
 
 
-def aug_image_by_keras(img):
-    return data_augmentation(img)
+# def aug_image_by_keras(img):
+#     return data_augmentation(img)
 
 
 def aug_transforms():
