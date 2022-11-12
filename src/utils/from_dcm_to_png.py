@@ -4,13 +4,12 @@ import sys
 import numpy as np
 import pydicom as dicom
 import cv2
-from natsort import natsorted
 
 result_path = '../dataset/new/'
 
 
 def from_dcm_to_png(directory):
-    paths_predicts = natsorted(glob.glob(directory + '*.dcm'))
+    paths_predicts = sorted(glob.glob(directory + '*.dcm'))
     for file, iter in zip(paths_predicts, range(1, len(paths_predicts) + 1)):
         read_write_file(file, '{:03}'.format(iter))
 

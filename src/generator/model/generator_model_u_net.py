@@ -1,7 +1,7 @@
-from tensorflow.keras.layers import *
-from tensorflow.keras.models import *
+from keras.layers import *
+from keras.layers import Resizing
+from keras.models import *
 from tensorflow import keras
-from tensorflow.python.keras.layers import Resizing
 
 model_path = '../models/generator/generator_weights.h5'
 
