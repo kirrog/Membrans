@@ -50,6 +50,10 @@ for subf in subfilders:
     assert len(d_l_o) == len(d_l_m) and len(d_l_b) == len(d_l_m)
     ng = subf / "NG"
     ng.mkdir(parents=True, exist_ok=True)
+    r = subf / "R"
+    r.mkdir(parents=True, exist_ok=True)
+    g = subf / "G"
+    g.mkdir(parents=True, exist_ok=True)
     rg = subf / "RG"
     rg.mkdir(parents=True, exist_ok=True)
     for i in tqdm(range(len(d_l_o))):
@@ -66,15 +70,25 @@ for subf in subfilders:
         image_2d[image_2d < 0.0] = 0.0
         image_2d_scaled_b = np.uint8((image_2d / image_2d.max()) * 255.0)
 
-        ng_np = np.zeros((image_2d.shape[0], image_2d.shape[1], 4))
-        plt.imsave((ng / f'{i:04d}.png'), ng_np)
+        ng_np = np.zeros((image_2d.shape[0], image_2d.shape[1], 4), dtype=np.uint8)
         ng_np[:, :, 1] = image_2d_scaled_o
         ng_np[:, :, 3] = image_2d_scaled_o
+        plt.imsave((ng / f'{i:04d}.png'), ng_np)
 
-        rg_np = np.zeros((image_2d.shape[0], image_2d.shape[1], 4))
-        ng_np[:, :, 0] = image_2d_scaled_m
-        ng_np[:, :, 1] = image_2d_scaled_b
+        g_np = np.zeros((image_2d.shape[0], image_2d.shape[1], 4), dtype=np.uint8)
+        g_np[:, :, 1] = image_2d_scaled_b
+        g_np[:, :, 3] = image_2d_scaled_b
+        plt.imsave((g / f'{i:04d}.png'), g_np)
+
+        r_np = np.zeros((image_2d.shape[0], image_2d.shape[1], 4), dtype=np.uint8)
+        r_np[:, :, 1] = image_2d_scaled_m
+        r_np[:, :, 3] = image_2d_scaled_m
+        plt.imsave((r / f'{i:04d}.png'), r_np)
+
+        rg_np = np.zeros((image_2d.shape[0], image_2d.shape[1], 4), dtype=np.uint8)
+        rg_np[:, :, 0] = image_2d_scaled_m
+        rg_np[:, :, 1] = image_2d_scaled_b
         mask = image_2d_scaled_b + image_2d_scaled_m
         mask[mask != 0] = 255
-        ng_np[:, :, 3] = mask
+        rg_np[:, :, 3] = mask
         plt.imsave((rg / f'{i:04d}.png'), rg_np)
