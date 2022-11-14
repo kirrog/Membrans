@@ -1,10 +1,13 @@
 import os
 import sys
 import time
+from pathlib import Path
 
+import numpy as np
 import tensorflow as tf
 from datetime import datetime
 
+from matplotlib import pyplot as plt
 from tqdm import tqdm
 
 from src.gan_model.dataset_generator_provider.dataset_generator_providers import generator_dataset_pair_creater
@@ -12,7 +15,7 @@ from src.utils.config_loader import train_data
 from src.utils.config_loader import test_data
 from src.clearer.dataset_generators.dataset_generator_providers import clearer_dataset_pair_creater
 
-log_dir = '../models/generator/logs/'
+log_dir = 'models/generator/logs/'
 checkpoint_prefix = os.path.join(log_dir, "ckpt")
 cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
 
@@ -27,6 +30,10 @@ def discriminator_loss(real_output, fake_output):
     return total_loss
 
 
+def generator_img_loss(fake_output, orig_output):
+    return cross_entropy(orig_output, fake_output)
+
+
 def generator_loss(fake_output):
     return cross_entropy(tf.ones_like(fake_output), fake_output)
 
@@ -34,8 +41,10 @@ def generator_loss(fake_output):
 def train_generator_model(model_coder, model_decoder, model_discriminator):
     generator_optimizer = tf.keras.optimizers.Adam(1e-4)
     discriminator_optimizer = tf.keras.optimizers.Adam(1e-4)
+    vae_optimizer = tf.keras.optimizers.Adam(1e-4)
     checkpoint = tf.train.Checkpoint(generator_optimizer=generator_optimizer,
                                      discriminator_optimizer=discriminator_optimizer,
+                                     vae_optimizer=vae_optimizer,
                                      coder=model_coder,
                                      decoder=model_decoder,
                                      discriminator=model_discriminator)
@@ -60,29 +69,40 @@ def train_generator_model(model_coder, model_decoder, model_discriminator):
     @tf.function
     def train_step(images, com):
 
-        with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
+        with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape, tf.GradientTape() as cod_tape, tf.GradientTape() as decod_tape:
             coded_images = model_coder(images[0], training=True)
             generated_images = model_decoder(coded_images, training=True)
             fake_output = model_discriminator(generated_images, training=True)
             real_output = model_discriminator(images[1], training=True)
-
+            gen_img_loss = generator_img_loss(generated_images, images[1])
             gen_loss = generator_loss(fake_output)
             disc_loss = discriminator_loss(real_output, fake_output)
 
-        gradients_of_decoder = gen_tape.gradient(gen_loss, model_decoder.trainable_variables)
+
+        gradients_of_vae_cod = cod_tape.gradient(gen_img_loss, model_coder.trainable_variables)
+        gradients_of_vae_decod = decod_tape.gradient(gen_img_loss, model_decoder.trainable_variables)
+        gradients_of_decoder = gen_tape.gradient(gen_loss, model_discriminator.trainable_variables)
         gradients_of_discriminator = disc_tape.gradient(disc_loss, model_discriminator.trainable_variables)
 
         if com == 0:
-            generator_optimizer.apply_gradients(zip(gradients_of_decoder, model_decoder.trainable_variables))
-            discriminator_optimizer.apply_gradients(
-                zip(gradients_of_discriminator, model_discriminator.trainable_variables))
+            generator_optimizer.apply_gradients(zip(gradients_of_decoder, model_discriminator.trainable_variables))
+            discriminator_optimizer.apply_gradients(zip(gradients_of_discriminator,
+                                                        model_discriminator.trainable_variables))
+            vae_optimizer.apply_gradients(
+                zip(gradients_of_vae_cod, model_coder.trainable_variables))
+            vae_optimizer.apply_gradients(
+                zip(gradients_of_vae_decod, model_decoder.trainable_variables))
         elif com == -1:
+            generator_optimizer.apply_gradients(zip(gradients_of_decoder, model_discriminator.trainable_variables))
             discriminator_optimizer.apply_gradients(
                 zip(gradients_of_discriminator, model_discriminator.trainable_variables))
         else:
-            generator_optimizer.apply_gradients(zip(gradients_of_decoder, model_decoder.trainable_variables))
+            vae_optimizer.apply_gradients(
+                zip(gradients_of_vae_cod, model_coder.trainable_variables))
+            vae_optimizer.apply_gradients(
+                zip(gradients_of_vae_decod, model_decoder.trainable_variables))
 
-        return gen_loss, disc_loss
+        return gen_img_loss, disc_loss + gen_loss
 
     @tf.function
     def test_step(images):
@@ -140,6 +160,9 @@ def train_generator_model(model_coder, model_decoder, model_discriminator):
     train(train_dataset, test_dataset, epochs)
 
 
+images_output_path = Path("/home/kirrog/projects/Membrans/dataset/gan")
+
+
 def test_generator_model(model_coder, model_decoder, model_discriminator):
     epochs = 50
 
@@ -149,30 +172,40 @@ def test_generator_model(model_coder, model_decoder, model_discriminator):
         generated_images = model_decoder(coded_images, training=False)
         fake_output = model_discriminator(generated_images, training=False)
 
-        return generator_loss(fake_output)
+        return generator_loss(fake_output), generated_images
 
-    test_dataset = generator_dataset_pair_creater(test_data)
+    test_dataset = generator_dataset_pair_creater(test_data, augment=False)
     generator_optimizer = tf.keras.optimizers.Adam(1e-4)
     discriminator_optimizer = tf.keras.optimizers.Adam(1e-4)
-    for i in range(epochs):
+    vae_optimizer = tf.keras.optimizers.Adam(1e-4)
+    for i in tqdm(range(epochs)):
 
         checkpoint = tf.train.Checkpoint(generator_optimizer=generator_optimizer,
                                          discriminator_optimizer=discriminator_optimizer,
+                                         vae_optimizer=vae_optimizer,
                                          coder=model_coder,
                                          decoder=model_decoder,
                                          discriminator=model_discriminator)
-        checkpoint.restore(f"/home/kirrog/Documents/projects/Membrans/models/generator/logs/ckpt-{i + 1}.index")
+        checkpoint.restore(f"/home/kirrog/projects/Membrans/models/generator/logs/ckpt-{i + 1}.index")
         start = time.time()
         test_loss = 0.0
         count_checks = 0
         count = 0
+        results_images = []
         for image_batch in test_dataset:
-            res = test_step(image_batch)
+            res, imgs = test_step(image_batch)
+            results_images.append(imgs)
             k = float(res.numpy())
             test_loss += abs(k)
             if abs(k) < 0.5:
                 count_checks += 1
             count += 1
-            sys.stdout.write(
-                f"\rTest {i + 1:02d} is {time.time() - start:0.1f} loss {test_loss / count:0.5f} acc {count_checks / count:0.5f}")
-        print()
+        sys.stdout.write(
+            f"Test {i + 1:02d} is {time.time() - start:0.1f} loss {test_loss / count:0.5f} acc {count_checks / count:0.5f}\n")
+        ep_img = images_output_path / f"{i:02d}"
+        ep_img.mkdir(parents=True, exist_ok=True)
+        for j, img in enumerate(results_images):
+            for k in range(img.shape[0]):
+                n = np.zeros((512, 512, 3))
+                n[:, :, 1] = img[k, :, :, 0]
+                plt.imsave((ep_img / f'{j * img.shape[0] + k:04d}.png'), n)

@@ -1,3 +1,4 @@
 * VAEN1 - seed 2202, x - orig, y - full one color results - indicate teeth, make brighter when already known, make dimly when defect
 * VAEN2 - seed 2202, x - orig, y - one color membran - full black
 * Unet_VAE - seed 2202, x - NG, y - one color membran - full black, 2 epoch, batch size - 3
+* GAN - seed 2202, x - ng, y one color membran, - don't learn decoder to do membran -> output is bone as usual, but generate bone on places, where it may be and mustn't be

@@ -1,15 +1,15 @@
 import glob
-import sys
 from queue import Queue
 from threading import Thread
 
-import tensorflow as tf
 import cv2
 import numpy as np
+import tensorflow as tf
 from matplotlib import pyplot as plt
+
 from src.utils.augmentations import augment_image
 
-paths_pred_masks = '*/ORIG/*.png'
+paths_pred_masks = '*/NG/*.png'
 paths_answ_masks = '*/RG/*.png'
 
 img_x, img_y = 512, 512
@@ -29,10 +29,11 @@ def rgb2red(image):
 
 class LoadDataWorker(Thread):
 
-    def __init__(self, queue_in, queue_out):
+    def __init__(self, queue_in, queue_out, augment):
         Thread.__init__(self)
         self.queue_in = queue_in
         self.queue_out = queue_out
+        self.augment = augment
 
     def run(self):
         while True:
@@ -40,27 +41,20 @@ class LoadDataWorker(Thread):
             try:
                 answer = rgb2red(plt.imread(img_path))
                 predictor = np.copy(cv2.cvtColor(cv2.imread(pred_path), cv2.COLOR_RGB2GRAY)) / 255
-
-                if answer.shape[0] != img_x or answer.shape[1] != img_y:
-                    answer = cv2.resize(answer, (img_x, img_y), interpolation=cv2.INTER_CUBIC)
-                if predictor.shape[0] != img_x or predictor.shape[1] != img_y:
-                    predictor = cv2.resize(predictor, (img_x, img_y), interpolation=cv2.INTER_CUBIC)
-
-                pred, answ = augment_image(predictor, answer)
-                pred, answ = pred.reshape((img_x, img_y, 1)), answ.reshape((img_x, img_y, 1))
+                pred, answ = generator_dataset_pair_augmentation(predictor, answer, self.augment)
                 self.queue_out.put((pred, answ))
             finally:
                 self.queue_in.task_done()
 
 
-def generator_dataset_pair_generator_parallel_getter(dataset_path):
+def generator_dataset_pair_generator_parallel_getter(dataset_path, augment):
     def generator_dataset_pair_generator_parallel():
         paths_answers = sorted(glob.glob(dataset_path + paths_answ_masks))
         paths_predicts = sorted(glob.glob(dataset_path + paths_pred_masks))
         queue_in_worker = Queue()
         queue_out_worker = Queue(maxsize=buffer_size)
         for x in range(treads_loader_number):
-            worker = LoadDataWorker(queue_in_worker, queue_out_worker)
+            worker = LoadDataWorker(queue_in_worker, queue_out_worker, augment)
             worker.daemon = True
             worker.start()
         for path_answer, path_predictor in zip(paths_answers, paths_predicts):
@@ -75,33 +69,26 @@ def generator_dataset_pair_generator_parallel_getter(dataset_path):
     return generator_dataset_pair_generator_parallel
 
 
-def transform_from_enum(enum, data):
-    return data[0], data[1]
-
-
-def generator_dataset_pair_augmentation(pred, answ):
+def generator_dataset_pair_augmentation(pred, answ, augment):
+    if augment:
+        pred, answ = augment_image(pred, answ)
     if pred.shape[0] != img_x or pred.shape[1] != img_y:
         pred = cv2.resize(pred, (img_x, img_y), interpolation=cv2.INTER_CUBIC)
     if answ.shape[0] != img_x or answ.shape[1] != img_y:
         answ = cv2.resize(answ, (img_x, img_y), interpolation=cv2.INTER_CUBIC)
-    pred, answ = augment_image(pred, answ)
     return pred.reshape((img_x, img_y, 1)), answ.reshape((img_x, img_y, 1))
 
 
-def generator_dataset_pair_creater(data_path):
+def generator_dataset_pair_creater(data_path, augment=True):
     dataset = tf.data.Dataset.from_generator(
-        generator_dataset_pair_generator_parallel_getter(data_path),
+        generator_dataset_pair_generator_parallel_getter(data_path, augment),
         output_signature=(
             tf.TensorSpec(shape=[512, 512, 1], dtype=tf.float32),
             tf.TensorSpec(shape=[512, 512, 1], dtype=tf.float32)
         )
     )
 
-    # dataset = dataset.shuffle(buffer_size=buffer_size)
     dataset = dataset.batch(batch_size, num_parallel_calls=batch_size)
     dataset = dataset.prefetch(buffer_size=buffer_size)
-
-    dataset = dataset.enumerate() \
-        .map(transform_from_enum, num_parallel_calls=parallel_augment)
 
     return dataset
