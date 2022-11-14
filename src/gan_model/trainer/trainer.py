@@ -110,7 +110,7 @@ def train_generator_model(model_coder, model_decoder, model_discriminator):
         generated_images = model_decoder(coded_images, training=False)
         fake_output = model_discriminator(generated_images, training=False)
 
-        return generator_loss(fake_output)
+        return generator_loss(fake_output) + generator_img_loss(images[0], images[1])
 
     train_dataset = generator_dataset_pair_creater(train_data)
     test_dataset = generator_dataset_pair_creater(test_data)
@@ -172,7 +172,7 @@ def test_generator_model(model_coder, model_decoder, model_discriminator):
         generated_images = model_decoder(coded_images, training=False)
         fake_output = model_discriminator(generated_images, training=False)
 
-        return generator_loss(fake_output), generated_images
+        return generator_loss(fake_output) + generator_img_loss(images[0], images[1]), generated_images
 
     test_dataset = generator_dataset_pair_creater(test_data, augment=False)
     generator_optimizer = tf.keras.optimizers.Adam(1e-4)

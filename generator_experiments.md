@@ -2,3 +2,4 @@
 * VAEN2 - seed 2202, x - orig, y - one color membran - full black
 * Unet_VAE - seed 2202, x - NG, y - one color membran - full black, 2 epoch, batch size - 3
 * GAN - seed 2202, x - ng, y one color membran, - don't learn decoder to do membran -> output is bone as usual, but generate bone on places, where it may be and mustn't be
+* GAN - seed 2202, x - ng, y one color membran, -> some epoches have high acc (49,41,39,36,35,33,32,26,24,23,22,21,20,19,14,13,10,9,8,7) - focused on teeths and bone
