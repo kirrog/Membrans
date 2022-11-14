@@ -1,10 +1,10 @@
 import glob
 import sys
+from pathlib import Path
 
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
-from natsort import natsorted
 from tensorflow import keras
 
 from src.utils.config_loader import batch_size
@@ -44,7 +44,7 @@ def add_numbers(pred, numbers_path):
 
 
 def read_from_png(directory):
-    paths_predicts = natsorted(glob.glob(directory + '/ORIG/*.png'))
+    paths_predicts = sorted(glob.glob(directory + 'ORIG/*.png'))
     print(len(paths_predicts))
     pred = np.zeros([len(paths_predicts), 512, 512])
     for file, iter in zip(paths_predicts, range(len(paths_predicts))):
@@ -59,18 +59,17 @@ def read_from_png(directory):
 
 data = read_from_png(one_test_data_dir)
 print(data.shape)
-data = add_numbers(data, one_test_data_dir + "/numbers.csv")
+# data = add_numbers(data, one_test_data_dir + "/numbers.csv")
 results = model.predict(x=data, batch_size=batch_size)
 
 
-def from_dcm_to_png(directory, data):
+def from_npy_to_png(directory, data):
+    Path(directory).mkdir(parents=True, exist_ok=True)
     for iter in range(data.shape[0]):
         d = np.zeros((data.shape[1], data.shape[2], 3))
         d[:, :, 0] = data[iter, :, :, 0]
-        d[:, :, 1] = data[iter, :, :, 1]
-        # d[:, :, 2] = data[iter, :, :, 0]
-        plt.imsave(directory + f"/{iter:04d}.png", d)
+        plt.imsave(str(directory) + f"/{iter:04d}.png", d)
         sys.stdout.write("\rImage %i written" % iter)
 
 
-from_dcm_to_png(output_data_dir, results)
+from_npy_to_png(output_data_dir, results)
