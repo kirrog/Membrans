@@ -1,0 +1,272 @@
+python -m src.generator_learn.py
+2022-11-14 18:12:11.204159: I tensorflow/core/util/util.cc:169] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+^C2022-11-14 18:12:12.104902: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:975] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2022-11-14 18:12:12.107883: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:975] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2022-11-14 18:12:12.107999: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:975] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+Traceback (most recent call last):
+  File "/home/kirrog/anaconda3/envs/tf-gpu/lib/python3.8/runpy.py", line 185, in _run_module_as_main
+    mod_name, mod_spec, code = _get_module_details(mod_name, _Error)
+  File "/home/kirrog/anaconda3/envs/tf-gpu/lib/python3.8/runpy.py", line 111, in _get_module_details
+    __import__(pkg_name)
+  File "/home/kirrog/projects/Membrans/src/generator_learn.py", line 8, in <module>
+    model_co = generator_model_coder()
+  File "/home/kirrog/projects/Membrans/src/gan_model/model/generator_model_u_net.py", line 24, in generator_model_coder
+    x = Conv2D(n_filt, 3, activation=activation, padding=padding,
+  File "/home/kirrog/.local/lib/python3.8/site-packages/keras/utils/traceback_utils.py", line 64, in error_handler
+    return fn(*args, **kwargs)
+  File "/home/kirrog/.local/lib/python3.8/site-packages/keras/engine/base_layer.py", line 944, in __call__
+    return self._functional_construction_call(inputs, args, kwargs,
+  File "/home/kirrog/.local/lib/python3.8/site-packages/keras/engine/base_layer.py", line 2315, in _functional_construction_call
+    outputs = self._keras_tensor_symbolic_call(
+  File "/home/kirrog/.local/lib/python3.8/site-packages/keras/engine/base_layer.py", line 2186, in _keras_tensor_symbolic_call
+    return self._infer_output_signature(inputs, args, kwargs, input_masks)
+  File "/home/kirrog/.local/lib/python3.8/site-packages/keras/engine/base_layer.py", line 2230, in _infer_output_signature
+    self._maybe_build(inputs)
+  File "/home/kirrog/.local/lib/python3.8/site-packages/keras/engine/base_layer.py", line 2759, in _maybe_build
+    self.build(input_shapes)  # pylint:disable=not-callable
+  File "/home/kirrog/.local/lib/python3.8/site-packages/keras/layers/convolutional/base_conv.py", line 193, in build
+    self.kernel = self.add_weight(
+  File "/home/kirrog/.local/lib/python3.8/site-packages/keras/engine/base_layer.py", line 665, in add_weight
+    variable = self._add_variable_with_custom_getter(
+  File "/home/kirrog/anaconda3/envs/tf-gpu/lib/python3.8/site-packages/tensorflow/python/training/tracking/base.py", line 873, in _add_variable_with_custom_getter
+    new_variable = getter(
+  File "/home/kirrog/.local/lib/python3.8/site-packages/keras/engine/base_layer_utils.py", line 126, in make_variable
+    return tf.compat.v1.Variable(
+  File "/home/kirrog/anaconda3/envs/tf-gpu/lib/python3.8/site-packages/tensorflow/python/util/traceback_utils.py", line 150, in error_handler
+    return fn(*args, **kwargs)
+  File "/home/kirrog/anaconda3/envs/tf-gpu/lib/python3.8/site-packages/tensorflow/python/ops/variables.py", line 264, in __call__
+    return cls._variable_v1_call(*args, **kwargs)
+  File "/home/kirrog/anaconda3/envs/tf-gpu/lib/python3.8/site-packages/tensorflow/python/ops/variables.py", line 209, in _variable_v1_call
+    return previous_getter(
+  File "/home/kirrog/anaconda3/envs/tf-gpu/lib/python3.8/site-packages/tensorflow/python/ops/variables.py", line 202, in <lambda>
+    previous_getter = lambda **kwargs: default_variable_creator(None, **kwargs)
+  File "/home/kirrog/anaconda3/envs/tf-gpu/lib/python3.8/site-packages/tensorflow/python/ops/variable_scope.py", line 2705, in default_variable_creator
+    return resource_variable_ops.ResourceVariable(
+  File "/home/kirrog/anaconda3/envs/tf-gpu/lib/python3.8/site-packages/tensorflow/python/util/traceback_utils.py", line 150, in error_handler
+    return fn(*args, **kwargs)
+  File "/home/kirrog/anaconda3/envs/tf-gpu/lib/python3.8/site-packages/tensorflow/python/ops/variables.py", line 268, in __call__
+    return super(VariableMetaclass, cls).__call__(*args, **kwargs)
+  File "/home/kirrog/anaconda3/envs/tf-gpu/lib/python3.8/site-packages/tensorflow/python/ops/resource_variable_ops.py", line 1630, in __init__
+    self._init_from_args(
+  File "/home/kirrog/anaconda3/envs/tf-gpu/lib/python3.8/site-packages/tensorflow/python/ops/resource_variable_ops.py", line 1783, in _init_from_args
+    initial_value = initial_value()
+  File "/home/kirrog/.local/lib/python3.8/site-packages/keras/initializers/initializers_v2.py", line 558, in __call__
+    return self._generate_init_val(shape=shape, dtype=dtype)
+  File "/home/kirrog/.local/lib/python3.8/site-packages/keras/initializers/initializers_v2.py", line 572, in _generate_init_val
+    return self._random_generator.truncated_normal(shape, 0.0, stddev, dtype)
+  File "/home/kirrog/.local/lib/python3.8/site-packages/keras/backend.py", line 1930, in truncated_normal
+    return tf.random.truncated_normal(
+  File "/home/kirrog/anaconda3/envs/tf-gpu/lib/python3.8/site-packages/tensorflow/python/util/traceback_utils.py", line 150, in error_handler
+    return fn(*args, **kwargs)
+  File "/home/kirrog/anaconda3/envs/tf-gpu/lib/python3.8/site-packages/tensorflow/python/util/dispatch.py", line 1082, in op_dispatch_handler
+    return dispatch_target(*args, **kwargs)
+  File "/home/kirrog/anaconda3/envs/tf-gpu/lib/python3.8/site-packages/tensorflow/python/ops/random_ops.py", line 196, in truncated_normal
+    shape_tensor = tensor_util.shape_tensor(shape)
+  File "/home/kirrog/anaconda3/envs/tf-gpu/lib/python3.8/site-packages/tensorflow/python/framework/tensor_util.py", line 1079, in shape_tensor
+    return ops.convert_to_tensor(shape, dtype=dtype, name="shape")
+  File "/home/kirrog/anaconda3/envs/tf-gpu/lib/python3.8/site-packages/tensorflow/python/profiler/trace.py", line 183, in wrapped
+    return func(*args, **kwargs)
+  File "/home/kirrog/anaconda3/envs/tf-gpu/lib/python3.8/site-packages/tensorflow/python/framework/ops.py", line 1640, in convert_to_tensor
+    ret = conversion_func(value, dtype=dtype, name=name, as_ref=as_ref)
+  File "/home/kirrog/anaconda3/envs/tf-gpu/lib/python3.8/site-packages/tensorflow/python/framework/constant_op.py", line 343, in _constant_tensor_conversion_function
+    return constant(v, dtype=dtype, name=name)
+  File "/home/kirrog/anaconda3/envs/tf-gpu/lib/python3.8/site-packages/tensorflow/python/framework/constant_op.py", line 267, in constant
+    return _constant_impl(value, dtype, shape, name, verify_shape=False,
+  File "/home/kirrog/anaconda3/envs/tf-gpu/lib/python3.8/site-packages/tensorflow/python/framework/constant_op.py", line 279, in _constant_impl
+    return _constant_eager_impl(ctx, value, dtype, shape, verify_shape)
+  File "/home/kirrog/anaconda3/envs/tf-gpu/lib/python3.8/site-packages/tensorflow/python/framework/constant_op.py", line 304, in _constant_eager_impl
+    t = convert_to_eager_tensor(value, ctx, dtype)
+  File "/home/kirrog/anaconda3/envs/tf-gpu/lib/python3.8/site-packages/tensorflow/python/framework/constant_op.py", line 101, in convert_to_eager_tensor
+    ctx.ensure_initialized()
+  File "/home/kirrog/anaconda3/envs/tf-gpu/lib/python3.8/site-packages/tensorflow/python/eager/context.py", line 590, in ensure_initialized
+    config_str = self.config.SerializeToString()
+  File "/home/kirrog/anaconda3/envs/tf-gpu/lib/python3.8/site-packages/tensorflow/python/eager/context.py", line 1088, in config
+    self._initialize_physical_devices()
+  File "/home/kirrog/anaconda3/envs/tf-gpu/lib/python3.8/site-packages/tensorflow/python/eager/context.py", line 1432, in _initialize_physical_devices
+    devs = pywrap_tfe.TF_ListPhysicalDevices()
+KeyboardInterrupt
+
+(tf-gpu) kirrog@kirrog-Z690-AORUS-PRO:~/projects/Membrans$ python -m src.generator_learn.py
+2022-11-14 18:12:21.022141: I tensorflow/core/util/util.cc:169] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2022-11-14 18:12:21.925169: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:975] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2022-11-14 18:12:21.927987: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:975] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2022-11-14 18:12:21.928095: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:975] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2022-11-14 18:12:21.928299: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 AVX_VNNI FMA
+To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2022-11-14 18:12:21.929048: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:975] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2022-11-14 18:12:21.929145: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:975] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2022-11-14 18:12:21.929191: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:975] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2022-11-14 18:12:22.199662: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:975] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2022-11-14 18:12:22.199864: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:975] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2022-11-14 18:12:22.199924: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:975] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2022-11-14 18:12:22.199976: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1532] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 9766 MB memory:  -> device: 0, name: NVIDIA GeForce RTX 3080, pci bus id: 0000:01:00.0, compute capability: 8.6
+(None, 32, 32, 256)
+(None, 512, 512, 1)
+(None, 1)
+/home/kirrog/anaconda3/envs/tf-gpu/lib/python3.8/site-packages/tensorflow/python/util/dispatch.py:1082: UserWarning: "`binary_crossentropy` received `from_logits=True`, but the `output` argument was produced by a sigmoid or softmax activation and thus does not represent logits. Was this intended?"
+  return dispatch_target(*args, **kwargs)
+2022-11-14 18:12:25.149524: I tensorflow/stream_executor/cuda/cuda_dnn.cc:384] Loaded cuDNN version 8100
+2022-11-14 18:12:25.527846: I tensorflow/core/platform/default/subprocess.cc:304] Start cannot spawn child process: No such file or directory
+2022-11-14 18:12:25.528244: I tensorflow/core/platform/default/subprocess.cc:304] Start cannot spawn child process: No such file or directory
+2022-11-14 18:12:25.528252: W tensorflow/stream_executor/gpu/asm_compiler.cc:80] Couldn't get ptxas version string: INTERNAL: Couldn't invoke ptxas --version
+2022-11-14 18:12:25.528671: I tensorflow/core/platform/default/subprocess.cc:304] Start cannot spawn child process: No such file or directory
+2022-11-14 18:12:25.528694: W tensorflow/stream_executor/gpu/redzone_allocator.cc:314] INTERNAL: Failed to launch ptxas
+Relying on driver to perform ptx compilation.
+Modify $PATH to customize ptxas location.
+This message will be only logged once.
+2022-11-14 18:12:26.014649: I tensorflow/stream_executor/cuda/cuda_blas.cc:1786] TensorFloat-32 will be used for the matrix multiplication. This will only be logged once.
+Train 01 is 51.4 sec | com -1 | gen_loss 0.85020 dis_loss 1.42698
+Test 01 is 8.3 loss 2.35819 acc 0.00000
+Train 02 is 49.6 sec | com -1 | gen_loss 0.84147 dis_loss 1.40033
+Test 02 is 7.2 loss 2.07453 acc 0.00000
+Train 03 is 49.3 sec | com -1 | gen_loss 0.83420 dis_loss 1.40490
+Test 03 is 7.8 loss 2.78867 acc 0.00000
+Train 04 is 49.4 sec | com -1 | gen_loss 0.82831 dis_loss 1.41883
+Test 04 is 7.4 loss 3.33442 acc 0.00000
+Train 05 is 49.2 sec | com -1 | gen_loss 0.82341 dis_loss 1.46543
+Test 05 is 7.3 loss 3.29939 acc 0.00000
+Train 06 is 49.3 sec | com -1 | gen_loss 0.81925 dis_loss 1.65349
+Test 06 is 7.9 loss 4.31001 acc 0.00000
+Train 07 is 49.8 sec | com -1 | gen_loss 0.81546 dis_loss 2.22142
+Test 07 is 8.3 loss 0.65985 acc 0.11644
+Train 08 is 51.9 sec | com -1 | gen_loss 0.81186 dis_loss 3.07150
+Test 08 is 7.9 loss 0.25518 acc 0.98630
+Train 09 is 50.2 sec | com -1 | gen_loss 0.80842 dis_loss 3.91793
+Test 09 is 7.5 loss 0.84392 acc 0.06164
+Train 10 is 48.9 sec | com -1 | gen_loss 0.80496 dis_loss 4.19048
+Test 10 is 7.6 loss 0.07378 acc 1.00000
+Train 11 is 49.0 sec | com -1 | gen_loss 0.80176 dis_loss 4.54391
+Test 11 is 7.8 loss 3.16208 acc 0.00000
+Train 12 is 49.4 sec | com -1 | gen_loss 0.79853 dis_loss 4.60739
+Test 12 is 7.8 loss 8.89814 acc 0.00000
+Train 13 is 49.2 sec | com -1 | gen_loss 0.79522 dis_loss 5.30595
+Test 13 is 7.7 loss 1.08651 acc 0.17123
+Train 14 is 49.3 sec | com -1 | gen_loss 0.79205 dis_loss 5.89893
+Test 14 is 7.7 loss 0.00123 acc 1.00000
+Train 15 is 49.0 sec | com -1 | gen_loss 0.78877 dis_loss 4.20575
+Test 15 is 7.5 loss 3.37799 acc 0.00000
+Train 16 is 49.6 sec | com -1 | gen_loss 0.78541 dis_loss 3.35034
+Test 16 is 7.6 loss 3.32843 acc 0.00000
+Train 17 is 49.8 sec | com -1 | gen_loss 0.78199 dis_loss 2.10242
+Test 17 is 8.2 loss 1.35948 acc 0.00000
+Train 18 is 49.5 sec | com -1 | gen_loss 0.77851 dis_loss 2.42730
+Test 18 is 8.1 loss 1.49212 acc 0.00000
+Train 19 is 50.0 sec | com -1 | gen_loss 0.77500 dis_loss 2.83080
+Test 19 is 7.7 loss 0.61559 acc 0.00685
+Train 20 is 48.9 sec | com -1 | gen_loss 0.77122 dis_loss 3.09708
+Test 20 is 8.0 loss 0.35606 acc 1.00000
+Train 21 is 49.2 sec | com -1 | gen_loss 0.76759 dis_loss 3.43970
+Test 21 is 7.5 loss 0.02860 acc 1.00000
+Train 22 is 49.4 sec | com -1 | gen_loss 0.76404 dis_loss 4.38113
+Test 22 is 7.3 loss 0.00034 acc 1.00000
+Train 23 is 48.7 sec | com -1 | gen_loss 0.76041 dis_loss 4.96232
+Test 23 is 7.8 loss 0.00000 acc 1.00000
+Train 24 is 48.4 sec | com -1 | gen_loss 0.75674 dis_loss 6.04842
+Test 24 is 8.0 loss 0.07665 acc 1.00000
+Train 25 is 50.0 sec | com -1 | gen_loss 0.75325 dis_loss 6.99526
+Test 25 is 7.6 loss 9.43301 acc 0.00000
+Train 26 is 48.6 sec | com -1 | gen_loss 0.74988 dis_loss 8.35605
+Test 26 is 7.3 loss 0.00000 acc 1.00000
+Train 27 is 50.4 sec | com -1 | gen_loss 0.74635 dis_loss 8.980887
+Test 27 is 7.7 loss 10.66402 acc 0.00000
+Train 28 is 48.5 sec | com -1 | gen_loss 0.74284 dis_loss 10.59460
+Test 28 is 7.8 loss 30.97316 acc 0.00000
+Train 29 is 49.5 sec | com -1 | gen_loss 0.73945 dis_loss 12.63536
+Test 29 is 7.2 loss 8.41643 acc 0.00000
+Train 30 is 49.6 sec | com -1 | gen_loss 0.73615 dis_loss 11.32269
+Test 30 is 7.2 loss 8.51329 acc 0.00000
+Train 31 is 49.2 sec | com -1 | gen_loss 0.73303 dis_loss 13.30066
+Test 31 is 7.9 loss 6.92864 acc 0.00000
+Train 32 is 50.4 sec | com -1 | gen_loss 0.72996 dis_loss 14.47829
+Test 32 is 7.8 loss 0.00000 acc 1.00000
+Train 33 is 48.9 sec | com -1 | gen_loss 0.72714 dis_loss 15.71117
+Test 33 is 7.5 loss 0.00000 acc 1.00000
+Train 34 is 49.0 sec | com -1 | gen_loss 0.72458 dis_loss 17.29796
+Test 34 is 7.4 loss 18.58041 acc 0.00000
+Train 35 is 49.2 sec | com -1 | gen_loss 0.72224 dis_loss 17.16019
+Test 35 is 7.6 loss 0.00000 acc 1.00000
+Train 36 is 49.4 sec | com -1 | gen_loss 0.72010 dis_loss 15.25848
+Test 36 is 7.6 loss 0.05267 acc 1.00000
+Train 37 is 49.9 sec | com -1 | gen_loss 0.71821 dis_loss 20.67452
+Test 37 is 7.7 loss 10.04051 acc 0.00000
+Train 38 is 50.2 sec | com -1 | gen_loss 0.71651 dis_loss 18.57961
+Test 38 is 7.5 loss 5.98481 acc 0.00000
+Train 39 is 49.0 sec | com -1 | gen_loss 0.71480 dis_loss 21.68279
+Test 39 is 7.6 loss 0.00000 acc 1.00000
+Train 40 is 49.3 sec | com -1 | gen_loss 0.71301 dis_loss 20.33484
+Test 40 is 7.5 loss 21.50510 acc 0.00000
+Train 41 is 48.3 sec | com -1 | gen_loss 0.71130 dis_loss 22.71966
+Test 41 is 7.8 loss 0.00000 acc 1.00000
+Train 42 is 49.8 sec | com -1 | gen_loss 0.70987 dis_loss 26.14339
+Test 42 is 7.5 loss 30.17888 acc 0.00000
+Train 43 is 49.0 sec | com -1 | gen_loss 0.70869 dis_loss 23.83479
+Test 43 is 7.5 loss 9.51043 acc 0.00000
+Train 44 is 49.7 sec | com -1 | gen_loss 0.70749 dis_loss 26.72139
+Test 44 is 7.7 loss 8.09547 acc 0.00000
+Train 45 is 49.7 sec | com -1 | gen_loss 0.70641 dis_loss 23.34824
+Test 45 is 7.6 loss 3.91139 acc 0.00000
+Train 46 is 50.5 sec | com -1 | gen_loss 0.70539 dis_loss 28.80940
+Test 46 is 7.2 loss 15.07580 acc 0.00000
+Train 47 is 50.8 sec | com -1 | gen_loss 0.70450 dis_loss 29.25089
+Test 47 is 7.9 loss 61.65255 acc 0.00000
+Train 48 is 49.7 sec | com -1 | gen_loss 0.70353 dis_loss 28.94115
+Test 48 is 7.6 loss 40.07765 acc 0.00000
+Train 49 is 49.1 sec | com -1 | gen_loss 0.70254 dis_loss 28.97039
+Test 49 is 7.2 loss 0.00000 acc 1.00000
+Train 50 is 49.1 sec | com -1 | gen_loss 0.70161 dis_loss 31.20389
+Test 50 is 8.0 loss 10.61848 acc 0.00000
+  0%|                                                                                                                                                                                                   | 0/50 [00:00<?, ?it/s]WARNING:tensorflow:From /home/kirrog/anaconda3/envs/tf-gpu/lib/python3.8/site-packages/tensorflow/python/training/tracking/util.py:1444: NameBasedSaverStatus.__init__ (from tensorflow.python.training.tracking.util) is deprecated and will be removed in a future version.
+Instructions for updating:
+Restoring a name-based tf.train.Saver checkpoint using the object-based restore API. This mode uses global names to match variables, and so is somewhat fragile. It also adds new restore ops to the graph each time it is called when graph building. Prefer re-encoding training checkpoints in the object-based format: run save() on the object-based saver (the same one this message is coming from) and use that checkpoint in the future.
+Test 01 is 2.1 loss 11.26682 acc 0.00000
+  2%|███▋                                                                                                                                                                                       | 1/50 [00:13<11:02, 13.52s/it]Test 02 is 1.7 loss 11.26726 acc 0.00000
+  4%|███████▍                                                                                                                                                                                   | 2/50 [00:26<10:35, 13.24s/it]Test 03 is 1.7 loss 11.26682 acc 0.00000
+  6%|███████████▏                                                                                                                                                                               | 3/50 [00:39<10:18, 13.15s/it]Test 04 is 1.7 loss 11.26682 acc 0.00000
+  8%|██████████████▉                                                                                                                                                                            | 4/50 [00:52<10:02, 13.10s/it]Test 05 is 1.7 loss 11.26717 acc 0.00000
+ 10%|██████████████████▋                                                                                                                                                                        | 5/50 [01:05<09:48, 13.09s/it]Test 06 is 1.7 loss 11.26726 acc 0.00000
+ 12%|██████████████████████▍                                                                                                                                                                    | 6/50 [01:18<09:35, 13.07s/it]Test 07 is 1.7 loss 11.26682 acc 0.00000
+ 14%|██████████████████████████▏                                                                                                                                                                | 7/50 [01:31<09:23, 13.11s/it]Test 08 is 1.6 loss 11.26682 acc 0.00000
+ 16%|█████████████████████████████▉                                                                                                                                                             | 8/50 [01:45<09:13, 13.18s/it]Test 09 is 1.6 loss 11.26682 acc 0.00000
+ 18%|█████████████████████████████████▋                                                                                                                                                         | 9/50 [01:58<09:02, 13.24s/it]Test 10 is 1.7 loss 11.26726 acc 0.00000
+ 20%|█████████████████████████████████████▏                                                                                                                                                    | 10/50 [02:12<08:51, 13.28s/it]Test 11 is 1.7 loss 11.26726 acc 0.00000
+ 22%|████████████████████████████████████████▉                                                                                                                                                 | 11/50 [02:25<08:40, 13.35s/it]Test 12 is 1.7 loss 11.26682 acc 0.00000
+ 24%|████████████████████████████████████████████▋                                                                                                                                             | 12/50 [02:38<08:27, 13.36s/it]Test 13 is 1.7 loss 11.26717 acc 0.00000
+ 26%|████████████████████████████████████████████████▎                                                                                                                                         | 13/50 [02:52<08:15, 13.39s/it]Test 14 is 1.7 loss 11.26689 acc 0.00000
+ 28%|████████████████████████████████████████████████████                                                                                                                                      | 14/50 [03:05<07:57, 13.28s/it]Test 15 is 1.7 loss 11.26682 acc 0.00000
+ 30%|███████████████████████████████████████████████████████▊                                                                                                                                  | 15/50 [03:18<07:42, 13.21s/it]Test 16 is 1.7 loss 11.26682 acc 0.00000
+ 32%|███████████████████████████████████████████████████████████▌                                                                                                                              | 16/50 [03:31<07:27, 13.16s/it]Test 17 is 1.7 loss 11.26682 acc 0.00000
+ 34%|███████████████████████████████████████████████████████████████▏                                                                                                                          | 17/50 [03:44<07:12, 13.10s/it]Test 18 is 1.7 loss 11.26682 acc 0.00000
+ 36%|██████████████████████████████████████████████████████████████████▉                                                                                                                       | 18/50 [03:57<06:57, 13.06s/it]Test 19 is 1.7 loss 11.26682 acc 0.00000
+ 38%|██████████████████████████████████████████████████████████████████████▋                                                                                                                   | 19/50 [04:10<06:44, 13.04s/it]Test 20 is 1.7 loss 11.26726 acc 0.00000
+ 40%|██████████████████████████████████████████████████████████████████████████▍                                                                                                               | 20/50 [04:23<06:30, 13.03s/it]Test 21 is 1.7 loss 11.26682 acc 0.00000
+ 42%|██████████████████████████████████████████████████████████████████████████████                                                                                                            | 21/50 [04:36<06:17, 13.01s/it]Test 22 is 1.7 loss 11.26717 acc 0.00000
+ 44%|█████████████████████████████████████████████████████████████████████████████████▊                                                                                                        | 22/50 [04:49<06:04, 13.01s/it]Test 23 is 1.7 loss 11.26717 acc 0.00000
+ 46%|█████████████████████████████████████████████████████████████████████████████████████▌                                                                                                    | 23/50 [05:02<05:51, 13.01s/it]Test 24 is 1.6 loss 11.26717 acc 0.00000
+ 48%|█████████████████████████████████████████████████████████████████████████████████████████▎                                                                                                | 24/50 [05:15<05:39, 13.04s/it]Test 25 is 1.7 loss 11.26682 acc 0.00000
+ 50%|█████████████████████████████████████████████████████████████████████████████████████████████                                                                                             | 25/50 [05:28<05:26, 13.04s/it]Test 26 is 1.7 loss 11.26682 acc 0.00000
+ 52%|████████████████████████████████████████████████████████████████████████████████████████████████▋                                                                                         | 26/50 [05:41<05:14, 13.09s/it]Test 27 is 1.6 loss 11.26726 acc 0.00000
+ 54%|████████████████████████████████████████████████████████████████████████████████████████████████████▍                                                                                     | 27/50 [05:54<05:01, 13.12s/it]Test 28 is 1.7 loss 11.26682 acc 0.00000
+ 56%|████████████████████████████████████████████████████████████████████████████████████████████████████████▏                                                                                 | 28/50 [06:08<04:49, 13.15s/it]Test 29 is 1.7 loss 11.26667 acc 0.00000
+ 58%|███████████████████████████████████████████████████████████████████████████████████████████████████████████▉                                                                              | 29/50 [06:21<04:35, 13.13s/it]Test 30 is 1.7 loss 11.26717 acc 0.00000
+ 60%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████▌                                                                          | 30/50 [06:34<04:22, 13.12s/it]Test 31 is 1.7 loss 11.26682 acc 0.00000
+ 62%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████▎                                                                      | 31/50 [06:47<04:10, 13.21s/it]Test 32 is 1.7 loss 11.26682 acc 0.00000
+ 64%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████                                                                   | 32/50 [07:01<03:58, 13.27s/it]Test 33 is 1.7 loss 11.26694 acc 0.00000
+ 66%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▊                                                               | 33/50 [07:14<03:46, 13.32s/it]Test 34 is 1.7 loss 11.26717 acc 0.00000
+ 68%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▍                                                           | 34/50 [07:27<03:32, 13.25s/it]Test 35 is 1.7 loss 11.26717 acc 0.00000
+ 70%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▏                                                       | 35/50 [07:40<03:18, 13.22s/it]Test 36 is 1.7 loss 11.26682 acc 0.00000
+ 72%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▉                                                    | 36/50 [07:53<03:04, 13.17s/it]Test 37 is 1.7 loss 11.26682 acc 0.00000
+ 74%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▋                                                | 37/50 [08:06<02:50, 13.14s/it]Test 38 is 1.7 loss 11.26682 acc 0.00000
+ 76%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▎                                            | 38/50 [08:20<02:37, 13.12s/it]Test 39 is 1.7 loss 11.26717 acc 0.00000
+ 78%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████                                         | 39/50 [08:33<02:24, 13.12s/it]Test 40 is 1.7 loss 11.26682 acc 0.00000
+ 80%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▊                                     | 40/50 [08:46<02:11, 13.16s/it]Test 41 is 1.7 loss 11.26726 acc 0.00000
+ 82%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▌                                 | 41/50 [08:59<01:58, 13.20s/it]Test 42 is 1.7 loss 11.26726 acc 0.00000
+ 84%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▏                             | 42/50 [09:12<01:45, 13.14s/it]Test 43 is 1.7 loss 11.26760 acc 0.00000
+ 86%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▉                          | 43/50 [09:25<01:31, 13.11s/it]Test 44 is 1.6 loss 11.26682 acc 0.00000
+ 88%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▋                      | 44/50 [09:38<01:18, 13.13s/it]Test 45 is 1.7 loss 11.26726 acc 0.00000
+ 90%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▍                  | 45/50 [09:52<01:05, 13.14s/it]Test 46 is 1.7 loss 11.26675 acc 0.00000
+ 92%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████               | 46/50 [10:05<00:52, 13.11s/it]Test 47 is 1.7 loss 11.26682 acc 0.00000
+ 94%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▊           | 47/50 [10:18<00:39, 13.12s/it]Test 48 is 1.7 loss 11.26717 acc 0.00000
+ 96%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▌       | 48/50 [10:31<00:26, 13.13s/it]Test 49 is 1.7 loss 11.26682 acc 0.00000
+ 98%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▎   | 49/50 [10:44<00:13, 13.11s/it]Test 50 is 1.7 loss 11.26682 acc 0.00000
+100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 50/50 [10:57<00:00, 13.15s/it]
+/home/kirrog/anaconda3/envs/tf-gpu/bin/python: Error while finding module specification for 'src.generator_learn.py' (ModuleNotFoundError: __path__ attribute not found on 'src.generator_learn' while trying to find 'src.generator_learn.py')
