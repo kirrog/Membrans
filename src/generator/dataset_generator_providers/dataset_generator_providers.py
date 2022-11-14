@@ -14,7 +14,7 @@ paths_answ_masks = '*/R/*.png'
 
 img_x, img_y = 512, 512
 parallel_augment = 9
-batch_size = 30
+batch_size = 3
 buffer_size = 600
 treads_loader_number = 10
 
@@ -86,7 +86,7 @@ def generator_dataset_pair_creater(data_path):
         )
     )
 
-    dataset = dataset.batch(batch_size, num_parallel_calls=batch_size)
+    dataset = dataset.batch(batch_size)
     dataset = dataset.prefetch(buffer_size=buffer_size)
     dataset = dataset.enumerate() \
         .map(transform_from_enum)

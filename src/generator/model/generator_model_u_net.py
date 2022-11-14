@@ -1,22 +1,22 @@
 from keras.layers import *
-from keras.layers import Resizing
+# from keras.layers import Resizing
 from keras.models import *
 from tensorflow import keras
 
 model_path = '../models/generator/generator_weights.h5'
 
 
-def get_attention_on_tooth(y, cross_data):
-    y = y[:, :32, :]
-    y = Dense(units=32, activation='relu')(y)
-    y = Reshape((32, 32, 1))(y)
-    for i in range(len(cross_data)):
-        x = cross_data[i]
-        x = Resizing(height=32, width=32)(x)
-        y = Conv2D(32 * pow(2, i), 3, activation='relu', padding='same',
-                   kernel_initializer='he_normal')(y)
-        y = Multiply()([x, y])
-    return y
+# def get_attention_on_tooth(y, cross_data):
+#     y = y[:, :32, :]
+#     y = Dense(units=32, activation='relu')(y)
+#     y = Reshape((32, 32, 1))(y)
+#     for i in range(len(cross_data)):
+#         x = cross_data[i]
+#         x = Resizing(height=32, width=32)(x)
+#         y = Conv2D(32 * pow(2, i), 3, activation='relu', padding='same',
+#                    kernel_initializer='he_normal')(y)
+#         y = Multiply()([x, y])
+#     return y
 
 
 def generator_model_u_net():
