@@ -9,7 +9,7 @@ from matplotlib import pyplot as plt
 
 from src.utils.augmentations import augment_image
 
-paths_pred_masks = '*/NG/*.png'
+paths_pred_masks = '*/G/*.png'
 paths_answ_masks = '*/RG/*.png'
 
 img_x, img_y = 512, 512
@@ -40,7 +40,7 @@ class LoadDataWorker(Thread):
             pred_path, img_path = self.queue_in.get()
             try:
                 answer = rgb2red(plt.imread(img_path))
-                predictor = np.copy(cv2.cvtColor(cv2.imread(pred_path), cv2.COLOR_RGB2GRAY)) / 255
+                predictor = rgb2green(cv2.imread(pred_path)) / 255
                 pred, answ = generator_dataset_pair_augmentation(predictor, answer, self.augment)
                 self.queue_out.put((pred, answ))
             finally:

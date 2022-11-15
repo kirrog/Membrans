@@ -11,8 +11,8 @@ import numpy as np
 import tensorflow as tf
 from matplotlib import pyplot as plt
 
-paths_pred_masks = '*/NG/*.png'
-paths_answ_masks = '*/RG/*.png'
+paths_pred_masks = '*/G/*.png'
+paths_answ_masks = '*/R/*.png'
 
 img_x, img_y = 512, 512
 parallel_augment = 1
@@ -126,7 +126,7 @@ class LoadDataWorker(Thread):
                 if predictor.shape[0] != img_x or predictor.shape[1] != img_y:
                     predictor = cv2.resize(predictor, (img_x, img_y), interpolation=cv2.INTER_CUBIC)
 
-                self.queue_out.put((predictor, answer, int(p.parent.parent.name), int(p.name[-8:-4])))
+                self.queue_out.put((predictor, answer, p.parent.parent.name, int(p.name[-8:-4])))
             finally:
                 self.queue_in.task_done()
 
@@ -190,10 +190,6 @@ def generator_dataset_pair_generator_parallel_getter(dataset_path):
     return generator_dataset_pair_generator_parallel
 
 
-def transform_from_enum(enum, data):
-    return data[0], data[1], data[2]
-
-
 def generator_dataset_pair_creater(data_path):
     dataset = tf.data.Dataset.from_generator(
         generator_dataset_pair_generator_parallel_getter(data_path),
@@ -207,7 +203,5 @@ def generator_dataset_pair_creater(data_path):
     dataset = dataset.shuffle(buffer_size=buffer_size)
     dataset = dataset.batch(batch_size, num_parallel_calls=batch_size)
     dataset = dataset.prefetch(buffer_size=buffer_size)
-
-    dataset = dataset.enumerate().map(transform_from_enum)
 
     return dataset
