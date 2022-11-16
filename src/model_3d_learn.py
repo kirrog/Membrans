@@ -8,10 +8,10 @@ from src.gen_3d.trainer.detector_trainer import train_detector_model
 from src.utils.config_loader import test_data, valid_data, train_data, model_path
 
 model = keras.models.load_model(model_path)
-# model = detector_model_getter()
-# train_detector_model(model)
+#model = detector_model_getter()
+#train_detector_model(model)
 
 # train_dataset = generator_dataset_pair_creater(train_data)
 # test_dataset = generator_dataset_pair_creater(test_data)
 out_path = "/home/kirrog/projects/Membrans/dataset/3d_results"
-apply_model(model, train_data, out_path)
+apply_model(model, test_data, out_path)

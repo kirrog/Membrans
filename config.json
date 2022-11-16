@@ -2,7 +2,7 @@
   "threads_loading": 10,
   "cache": 30,
   "batch_size": 3,
-  "model_path": "/home/kirrog/projects/Membrans/models/detector/logs/ep001-loss0.546-val_loss7.701-accuracy0.856_20221116-111932.h5",
+  "model_path": "/home/kirrog/projects/Membrans/models/detector/logs/ep001-loss10.576-val_loss0.380-accuracy0.833_20221116-174443.h5",
   "model_path_logs": "models/clearer/logs/r2u_net/ep002-loss0.095-val_loss0.132-accuracy0.955_20211019-183449.h5",
   "train_data": "/media/kirrog/workdata/membransdata/newes/train/",
   "test_data": "/media/kirrog/workdata/membransdata/newes/test/",
