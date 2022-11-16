@@ -34,7 +34,7 @@ def detector_model_getter():
         x = MaxPooling3D(pool_size=pool_size)(x)
         x = Dropout(p_drop)(x)
 
-    x = Conv2D(8, 8, activation=activation, padding=padding,
+    x = Conv3D(8, 8, activation=activation, padding=padding,
                kernel_initializer=kernel_initializer)(x)
 
     for i in range(num_of_slices_in_crater):

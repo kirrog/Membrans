@@ -3,7 +3,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from pydicom.uid import RLELossless
 
-dcm = dicom.dcmread('../dataset/test/001.dcm')
+dcm = dicom.dcmread('dataset/test/001.dcm')
 
 # dcm.PixelData = np.zeros([600, 600]).tobytes()
 data = np.zeros([600, 600], dtype=np.uint16)

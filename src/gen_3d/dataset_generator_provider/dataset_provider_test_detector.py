@@ -11,12 +11,12 @@ import numpy as np
 from matplotlib import pyplot as plt
 from tqdm import tqdm
 
-paths_pred_masks = '*/NG/*.png'
+paths_pred_masks = '*/G/*.png'
 paths_answ_masks = '*/RG/*.png'
 
 img_x, img_y = 512, 512
 parallel_augment = 1
-batch_size = 48
+batch_size = 16
 queue_buffer_size = 200000
 buffer_size = 2000
 treads_loader_number = 32
@@ -60,7 +60,7 @@ class LoadDataWorker(Thread):
                     predictor = rgb2green(plt.imread(pred_path))
                     if predictor.shape[0] != img_x or predictor.shape[1] != img_y:
                         predictor = cv2.resize(predictor, (img_x, img_y), interpolation=cv2.INTER_CUBIC)
-                    self.queue_out.put((predictor, int(p.parent.parent.name), int(p.name[-8:-4])))
+                    self.queue_out.put((predictor, p.parent.parent.name, int(p.name[-8:-4])))
                 finally:
                     self.queue_in.task_done()
         except _queue.Empty:
@@ -146,3 +146,4 @@ def apply_model(model, dataset_path: str, result_path: str):
 
         for image_num in tqdm(range(case_len), desc="saving images"):
             plt.imsave(p / f"{image_num:03d}.png", red2rgb(result_data[:, :, image_num]))
+        case_num+=1
