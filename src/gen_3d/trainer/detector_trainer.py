@@ -8,7 +8,7 @@ from src.utils.config_loader import test_data, valid_data, train_data
 
 log_dir = 'models/detector/logs/'
 batch_size = 6
-epochs = 50
+epochs = 1
 
 optimizer = {
     "adam": 'adam',

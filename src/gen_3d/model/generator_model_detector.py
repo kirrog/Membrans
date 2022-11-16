@@ -5,8 +5,8 @@ slice_height = 32
 
 
 def detector_model_getter():
-    a_regularizer = tf.keras.regularizers.L1L2(l1=0.0001, l2=0.001)
-    b_regularizer = tf.keras.regularizers.L1L2(l1=0.001, l2=0.01)
+    a_regularizer = tf.keras.regularizers.L1L2(l1=0.00001, l2=0.0001)
+    b_regularizer = tf.keras.regularizers.L1L2(l1=0.0001, l2=0.001)
     
     size = [slice_height, slice_height, slice_height]
     activation = 'relu'

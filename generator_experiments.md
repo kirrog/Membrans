@@ -6,3 +6,5 @@
 * Det - seed 2202, x - g, y - r, 1/10 bone/membran -> can increase acc, but at test and train give zero or more spaces with wrong form, but localised, 1 epoch, scale - 8
 * Det - seed 2202, x - g, y - r, 1~1 bone/membran -> strange middle line of points, and more times seen something like a membran, but in wrong places
 * Det - seed 2202, x - g, y - r, 1~1 bone/membran, regularization -> strange middle line
+* Det - seed 2202, x - g, y - r, 1~1 bone/membran, regularization, scale 8 -> strange middle line
+* Det - seed 2202, x - g, y - r, 1~1 bone/membran, regularization littler on 10 times, scale 8 -> strange middle line

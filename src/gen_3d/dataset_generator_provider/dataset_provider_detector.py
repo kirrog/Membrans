@@ -31,7 +31,7 @@ p_slice_height = int(slice_height / 2)
 
 
 treshold = 0.5
-scale = 1
+scale = 8
 
 def rgb2green(image):
     if image.shape[2] > 3:
