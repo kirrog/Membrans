@@ -1,14 +1,17 @@
 import glob
 import time
+
+import cv2
 import pydicom
 import numpy as np
+from natsort import natsorted
 
 from pydicom.misc import is_dicom
 
 
 def find_dicom_files(directory):
     dcm_files = []
-    files = glob.glob(directory + '/*.dcm')
+    files = natsorted(glob.glob(directory + '/*.dcm'))
     for file in files:
         if is_dicom(file):
             dcm_files.append(file)
@@ -31,6 +34,15 @@ def convert_dicom(directory):
 
     for dcm_file in dicom_files:
         data = pydicom.dcmread(dcm_file)
+        # data.sort(key=lambda x: float(x.ImagePositionPatient[2]))
+
+        if data.pixel_array.shape[0] < dicom_np_array.shape[1] or data.pixel_array.shape[1] < dicom_np_array.shape[2]:
+            data.pixel_array = cv2.resize(data.pixel_array, (dicom_np_array.shape[2], dicom_np_array.shape[1]),
+                                          interpolation=cv2.INTER_CUBIC)
+        elif data.pixel_array.shape[0] > dicom_np_array.shape[1] or data.pixel_array.shape[1] > dicom_np_array.shape[2]:
+            data.pixel_array = cv2.resize(data.pixel_array, (dicom_np_array.shape[2], dicom_np_array.shape[1]),
+                                          interpolation=cv2.INTER_AREA)
+
         dicom_np_array[dicom_files.index(dcm_file), :, :] = data.pixel_array
 
     return dicom_np_array
