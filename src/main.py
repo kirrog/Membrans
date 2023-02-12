@@ -1,10 +1,10 @@
-import glob
-import sys
-import cv2
-import numpy as np
+import json
+from pathlib import Path
 
-from natsort import natsorted
-from tensorflow import keras
+import numpy as np
+import argparse
+import nibabel as nib
+import dicom2nifti
 
 patient_path = '../patient_data'
 clearer_model_path = '../result_models/clearer_weights.h5'
@@ -17,90 +17,80 @@ batch_size = 3
 img_x, img_y = 512, 512
 
 
-def load_patient():
-    paths_predicts = natsorted(glob.glob(patient_path + paths_pred_masks))
-
-    set_predictors = np.zeros((len(paths_predicts), img_x, img_y, 1), dtype=np.float16)
-
-    for path_predictor, i in zip(paths_predicts, range(len(paths_predicts))):
-        predictor = cv2.cvtColor(cv2.imread(path_predictor), cv2.COLOR_RGB2GRAY)
-        set_predictors[i] = np.copy(predictor) / 255
-        sys.stdout.write("\rImage %i loaded" % i)
-    print('Patient loaded')
-    return set_predictors
+def parse_args():
+    parser = argparse.ArgumentParser("Program arguments")
+    parser.add_argument("--input_directory", help="Directory of dicom", type=str)
+    parser.add_argument("--input_file", help="File with places if interest", type=str)
+    parser.add_argument("--output_directory", help="Directory of stl", type=str)
+    parser.add_argument("--cache_directory", help="Directory of cache", type=str)
+    parser.add_argument("--config", help="Config file", type=str, default="./config.json")
+    args = parser.parse_args()
+    return args
 
 
-def clearer_load():
-    model = keras.models.load_model(clearer_model_path)
-    print('Clearer loaded')
-    return model
+def parse_config_file(config_file: str):
+    path = Path(config_file)
+    if not path.exists():
+        print(f"Config file dn exists {config_file}")
+        exit(1)
+    with open(config_file, "r") as f:
+        data = json.load(f)
+        print(data)
+    return data
 
 
-def generator_load():
-    model = keras.models.load_model(generator_model_path)
-    print('Generator loaded')
-    return model
+def convert_dcm2nifti(input_dir: Path, output_nifti: Path):
+    dicom2nifti.dicom_series_to_nifti(str(input_dir), str(output_nifti))
 
 
-def teeth_finder_load():
-    model = keras.models.load_model(teeth_finder_model_path)
-    print('Teeth finder loaded')
-    return model
+def load_nifti(nifti_file_path: Path):
+    return nib.load(str(nifti_file_path))
 
 
-def xor_image_sets(orig, deleter):
-    result = np.zeros((len(orig), img_x, img_y, 1), dtype=np.float16)
-    for orig_image, deleter_image, iter in zip(orig, deleter, range(len(orig))):
-        for i in range(img_x):
-            for j in range(img_y):
-                result[iter][i][j] = max(0, (orig_image[i][j] - deleter_image[i][j]))
-    return result
+def load_patient(dir_path_str: str, file_path_str: str, cache_dir_path_str: str):
+    dir_path = Path(dir_path_str)
+    if not dir_path.exists():
+        print(f"Input directory dn exists {dir_path_str}")
+        exit(1)
+    file_path = Path(file_path_str)
+    if not file_path.exists():
+        print(f"Input file dn exists {file_path_str}")
+        print("Can't get features")
+    cache_dir_path = Path(cache_dir_path_str)
+    cache_dir_path.mkdir(exist_ok=True, parents=True)
+    nifti_output_file = cache_dir_path / "in_data.nii.gz"
+    convert_dcm2nifti(dir_path, nifti_output_file)
+    nifti_image = load_nifti(nifti_output_file)
+    with open(file_path_str, "r") as f:
+        nums = f.read().split(",")
+    print(nums)
+    return nifti_image, nums
 
 
-def delete_teeth(orig, teeth):
-    res = xor_image_sets(orig, teeth)
-    print('Teeth deleted')
-    return res
+def clearer_predict(config: dict, input_data: np.array) -> np.array:
+    return None
 
 
-def membran_model_xor_creater(healthy_model_without_teeth, sick_mask):
-    res = xor_image_sets(healthy_model_without_teeth, sick_mask)
-    print('Model formed')
-    return res
+def generator_predict(config: dict, input_data: np.array) -> np.array:
+    return None
 
 
-def clear_from_artifacts(membran):
-    # Make by practice
-    print('Cleared')
+def get_membran_surface_from_volume(config: dict, input_data: np.array) -> np.array:
+    return None
 
 
-def save_npy(name, data):
-    np.save(numpys_path + name, data)
+def save2nifti(path_to_save: Path, data: nib.nifti2.Nifti1Image):
+    nib.save(data, str(path_to_save))
 
 
-raw_data = load_patient()
-
-clearer_model = clearer_load()
-generator_model = generator_load()
-teeth_finder_model = teeth_finder_load()
-
-cleared_data = clearer_model.predict(raw_data)
-save_npy('cleared_masks.npy', cleared_data)
-healthy_mask = generator_model.predict(cleared_data)
-save_npy('healthy_masks.npy', healthy_mask)
-
-sick_teeth_masks = teeth_finder_model.predict(cleared_data)
-save_npy('sick_teeth_masks.npy', sick_teeth_masks)
-healthy_teeth_masks = teeth_finder_model.predict(healthy_mask)
-save_npy('healthy_teeth_masks.npy', healthy_teeth_masks)
-
-sick_without_teeth = delete_teeth(cleared_data, sick_teeth_masks)
-save_npy('sick_without_teeth.npy', sick_without_teeth)
-healthy_without_teeth = delete_teeth(healthy_mask, healthy_teeth_masks)
-save_npy('healthy_without_teeth.npy', healthy_without_teeth)
-
-membran_model = membran_model_xor_creater(healthy_without_teeth, sick_without_teeth)
-save_npy('membran_model.npy', membran_model)
-
-cleared_membran_model = clear_from_artifacts(membran_model)
-save_npy('result.npy', cleared_membran_model)
+args = parse_args()
+input_directory = args.input_directory
+input_file = args.input_file
+output_directory = args.output_directory
+cache_directory = args.cache_directory
+config = args.config
+config_data = parse_config_file(config)
+nifti_image, nums = load_patient(input_directory, input_file, cache_directory)
+nifti_data = nifti_image.get_data()
+print(
+    f"Patient data loaded: shape {nifti_data.shape} min {nifti_data.min()} max {nifti_data.max()} mean {nifti_data.mean()}")
