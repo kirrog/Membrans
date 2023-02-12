@@ -79,8 +79,16 @@ def get_membran_surface_from_volume(config: dict, input_data: np.array) -> np.ar
     return None
 
 
+def convert_3d_array2stl(config: dict, input_data: np.array):
+    return 1
+
+
 def save2nifti(path_to_save: Path, data: nib.nifti2.Nifti1Image):
     nib.save(data, str(path_to_save))
+
+
+def save_stl(path_to_save: Path, stl_data):
+    pass
 
 
 args = parse_args()
@@ -92,5 +100,13 @@ config = args.config
 config_data = parse_config_file(config)
 nifti_image, nums = load_patient(input_directory, input_file, cache_directory)
 nifti_data = nifti_image.get_data()
-print(
-    f"Patient data loaded: shape {nifti_data.shape} min {nifti_data.min()} max {nifti_data.max()} mean {nifti_data.mean()}")
+print(f"Patient data loaded: shape {nifti_data.shape} "
+      f"min {nifti_data.min()} max {nifti_data.max()} mean {nifti_data.mean()}")
+cleared_data = clearer_predict(config_data, nifti_data)
+save2nifti(cache_directory / "cleared.nii.gz", cleared_data)
+generated_data = generator_predict(config_data, cleared_data)
+save2nifti(cache_directory / "generated.nii.gz", generated_data)
+surface_data = get_membran_surface_from_volume(config_data, generated_data)
+save2nifti(cache_directory / "surface.nii.gz", surface_data)
+stl_data = convert_3d_array2stl(config_data, surface_data)
+save_stl(cache_directory / "membran_surface.stl", stl_data)
