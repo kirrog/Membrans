@@ -1,7 +1,6 @@
 import glob
 import sys
 import cv2
-from natsort import natsorted
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -55,8 +54,8 @@ def load_clearer_dataset_to_numpy_table(file_path):
 
 def load_clearer_dataset_from_images():
     data_fold = dataset_path
-    paths_predicts = natsorted(glob.glob(data_fold + paths_pred_masks))
-    paths_answers = natsorted(glob.glob(data_fold + paths_answ_masks))
+    paths_predicts = sorted(glob.glob(data_fold + paths_pred_masks))
+    paths_answers = sorted(glob.glob(data_fold + paths_answ_masks))
 
     set_predictors = np.zeros((len(paths_predicts), img_x, img_y, 1), dtype=np.float16)
     set_answers = np.zeros((len(paths_answers), img_x, img_y, 1), dtype=np.float16)
@@ -78,7 +77,7 @@ def load_clearer_dataset_from_images():
 
 def load_clearer_predicts_from_images():
     data_fold = dataset_path
-    paths_predicts = natsorted(glob.glob(data_fold + paths_pred_masks))
+    paths_predicts = sorted(glob.glob(data_fold + paths_pred_masks))
 
     set_predictors = np.zeros((len(paths_predicts), img_x, img_y, 1), dtype=np.float16)
 
@@ -91,7 +90,7 @@ def load_clearer_predicts_from_images():
 
 def load_clearer_answers_from_images():
     data_fold = dataset_path
-    paths_answers = natsorted(glob.glob(data_fold + paths_answ_masks))
+    paths_answers = sorted(glob.glob(data_fold + paths_answ_masks))
 
     set_answers = np.zeros((len(paths_answers), img_x, img_y, 1), dtype=np.float16)
 
@@ -109,7 +108,7 @@ def make_clearer_dataset():
 
 
 def load_test_dataset_from_images():
-    paths_predicts = natsorted(glob.glob(test_dataset_path + paths_test_masks))
+    paths_predicts = sorted(glob.glob(test_dataset_path + paths_test_masks))
     print(len(paths_predicts))
     set_predictors = np.zeros((len(paths_predicts), img_x, img_y, 1), dtype=np.float16)
 
@@ -123,7 +122,7 @@ def load_test_dataset_from_images():
 
 
 def load_test_dataset_from_images_from(path):
-    paths_predicts = natsorted(glob.glob(path + "*.png"))
+    paths_predicts = sorted(glob.glob(path + "*.png"))
     print(len(paths_predicts))
     set_predictors = np.zeros((len(paths_predicts), img_x, img_y, 1), dtype=np.float16)
 
