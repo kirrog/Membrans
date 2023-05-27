@@ -1,78 +1,27 @@
-from multiprocessing.pool import Pool
+from pathlib import Path
 
 import numpy as np
-from tqdm import tqdm
+import voxelfuse as vf
+from voxelfuse import VoxelModel
 
 
-def create_sphere_array(size: int):
-    data = np.zeros((size, size, size))
-    for i in tqdm(range(data.shape[0])):
-        for j in range(data.shape[1]):
-            for k in range(data.shape[2]):
-                x = i - (size // 2)
-                y = j - (size // 2)
-                z = k - (size // 2)
-                if (x ** 2 + y ** 2 + z ** 2) < (size // 4) ** 2:
-                    data[i, j, k] = 1
-    print(data.shape)
-    print(data.mean())
-    return data
+def save_numpy_as_mesh(voxel_model: VoxelModel, path_output: Path, show: bool = False):
+    mesh = vf.Mesh.fromVoxelModel(voxel_model, (0.0, 1.0, 0.0, 1.0))
+    mesh.export(str(path_output))
+    if show:
+        mesh.viewer(grids=True, name='mesh')
 
 
-def convert_numpy2stl(data: np.array):
-    assert len(data.shape) == 3
-    x_size, y_size, z_size = data.shape
-    surface_points = []
-    for i in tqdm(range(data.shape[0])):
-        for j in range(data.shape[1]):
-            for k in range(data.shape[2]):
-                val = data[max(i - 1, 0):min(i + 2, x_size - 1),
-                      max(j - 1, 0):min(j + 2, y_size - 1),
-                      max(k - 1, 0):min(k + 2, z_size - 1)].mean()
-                if 1.0 > val > 0.0 and data[i, j, k] == 1:
-                    surface_points.append((i, j, k))
-    return surface_points
+def load_and_process(filepath_in: Path, filepath_out: Path):
+    data = np.load(str(filepath_in))
+    data[data < 0.0] = 0.0
+    data[data > 0.0] = 1.0
+    model = VoxelModel(data, 1)
+    save_numpy_as_mesh(model, filepath_out, True)
 
 
-def extract_triangles(view):
-    # кубиковые варианты - не будут получаться на внешней стороне - игнор
-    # пирамидковые варианты
-    # отсутствие одной точки
-    # склоны пирамидки
-    # плоскость
-    # плоская пирамидка
-    return []
-
-
-def create_triangles(point, data):
-    x_size, y_size, z_size = data.shape
-    i, j, k = point
-    view = data[max(i - 1, 0):min(i + 2, x_size - 1),
-           max(j - 1, 0):min(j + 2, y_size - 1),
-           max(k - 1, 0):min(k + 2, z_size - 1)]
-    r = []
-    for i in range(2):
-        for j in range(2):
-            for k in range(2):
-                d = view[i:i + 2, j:j + 2, k:k + 2]
-                r.append(d)
-    result_triangles = []
-    for v in r:
-        result_triangles.extend(extract_triangles(v))
-    return result_triangles
-
-
-def protoype(data, points):
-    with Pool() as p:
-        triples = p.imap_unordered(create_triangles, [(x, data) for x in points])
-    result = []
-    for tr in triples:
-        result.extend(tr)
-    return result
-
-
-size = 8
-data = create_sphere_array(size)
-points = convert_numpy2stl(data)
-print(len(points))
-print(points)
+# Start Application
+if __name__ == '__main__':
+    file_in = Path("/media/kirrog/workdata/membransdata/newes/test/stpv/numpy/stpvM.npy")
+    file_out = Path("modelResult.stl")
+    load_and_process(file_in, file_out)
