@@ -1,13 +1,9 @@
-from tensorflow import keras
-
-import numpy as np
-
 from src.gen_3d.dataset_generator_provider.dataset_provider_test_detector import apply_model
 from src.gen_3d.model.generator_model_detector import detector_model_getter
 from src.gen_3d.trainer.detector_trainer import train_detector_model
-from src.utils.config_loader import test_data, valid_data, train_data, model_path
+from src.utils.config_loader import test_data
 
-#model = keras.models.load_model(model_path)
+# model = keras.models.load_model(model_path)
 model = detector_model_getter()
 train_detector_model(model)
 
