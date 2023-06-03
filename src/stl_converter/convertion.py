@@ -1,9 +1,7 @@
-from collections import defaultdict
 from pathlib import Path
 
 import numpy as np
 import voxelfuse as vf
-from tqdm import tqdm
 
 min_size = 3
 membran_code = 1
