@@ -5,13 +5,9 @@ from pathlib import Path
 from pprint import pprint
 
 import cv2
-import nibabel as nib
 import numpy as np
 import pydicom as dicom
 from tqdm import tqdm
-
-from src.clearer.dataset_generators.dataset_generator_providers import clearer_dataset_pair_creater
-from src.utils.config_loader import train_data
 
 patient_path = '../patient_data'
 clearer_model_path = '../result_models/clearer_weights.h5'
@@ -101,3 +97,12 @@ if __name__ == "__main__":
     config = args.config
     config_data = parse_config_file(config)
     numpy_image, nums = load_patient(input_directory)
+
+    # load clearer model
+    # apply model
+    # load detector model
+    # apply detector model
+    # load converter model
+    # apply converter model
+    # convert result to stl
+    # save stl

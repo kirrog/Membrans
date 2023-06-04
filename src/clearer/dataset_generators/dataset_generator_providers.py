@@ -14,7 +14,7 @@ paths_answ_masks = '*/G/*.png'
 
 img_x, img_y = 512, 512
 parallel_augment = 9
-batch_size = 3
+batch_size = 4
 buffer_size = 30
 treads_loader_number = 10
 

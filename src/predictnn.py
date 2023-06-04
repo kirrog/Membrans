@@ -41,8 +41,8 @@ def from_dcm_to_png(directory, data, img_x_orig, img_y_orig):
     print(data.shape)
     for iter in range(data.shape[0]):
         # '{:03}'.format(iter)
-        data = cv2.resize(data[iter], (img_x_orig, img_y_orig), interpolation=cv2.INTER_CUBIC)
-        image_2d_scaled = (np.maximum(data, 0) / data.max()) * 255.0
+        image = cv2.resize(data[iter], (img_x_orig, img_y_orig), interpolation=cv2.INTER_CUBIC)
+        image_2d_scaled = (np.maximum(image, 0) / image.max()) * 255.0
         image_2d_scaled = np.uint8(image_2d_scaled)
         cv2.imwrite((directory + f'{iter:04}' + '.png'), image_2d_scaled)
         sys.stdout.write("\rImage %i written" % iter)

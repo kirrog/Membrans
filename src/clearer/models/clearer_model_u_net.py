@@ -1,4 +1,3 @@
-import tensorflow as tf
 from keras import regularizers
 from keras.layers import *
 from keras.models import *
