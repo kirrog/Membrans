@@ -95,10 +95,9 @@ def load_patient(dir_path_str: str):
 
 
 if __name__ == "__main__":
-    # args = parse_args()
-    # input_directory = args.input_directory if args.input_directory is not None else "../dataset/inference_data_dir/001"
-    # output_directory = args.output_directory if args.output_directory is not None else "../dataset/inference_results/001"
-    # config = args.config
-    # config_data = parse_config_file(config)
-    # numpy_image, nums = load_patient(input_directory)
-    exit(0)
+    args = parse_args()
+    input_directory = args.input_directory if args.input_directory is not None else "../dataset/inference_data_dir/001"
+    output_directory = args.output_directory if args.output_directory is not None else "../dataset/inference_results/001"
+    config = args.config
+    config_data = parse_config_file(config)
+    numpy_image, nums = load_patient(input_directory)
