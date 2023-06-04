@@ -1,13 +1,13 @@
 {
   "threads_loading": 10,
   "cache": 30,
-  "batch_size": 3,
-  "model_path": "/home/kirrog/projects/Membrans/models/detector/logs/ep001-loss11.212-val_loss0.917-accuracy0.416_20221116-182452.h5",
+  "batch_size": 4,
+  "model_path": "/home/kirrog/projects/Membrans/models/clearer/U-Net/good/5_aug/clearer_weights_aug.h5",
   "model_path_logs": "models/clearer/logs/r2u_net/ep002-loss0.095-val_loss0.132-accuracy0.955_20211019-183449.h5",
   "train_data": "/media/kirrog/workdata/membransdata/newes/train/",
   "test_data": "/media/kirrog/workdata/membransdata/newes/test/",
   "valid_data": "/media/kirrog/workdata/membransdata/valid/",
-  "one_test_data_dir": "/media/kirrog/workdata/membransdata/valid/010/",
+  "one_test_data_dir": "/media/kirrog/workdata/membransdata/valid/010/DICOM/",
   "output_data_dir": "dataset/new/",
   "output_model_dir": "models/new/clearer_weights.h5"
 }

@@ -9,8 +9,8 @@ from matplotlib import pyplot as plt
 
 from src.utils.augmentations import augment_image
 
-paths_pred_masks = '*/ORIG/*.png'
-paths_answ_masks = '*/NG/*.png'
+paths_pred_masks = '*/NG/*.png'
+paths_answ_masks = '*/G/*.png'
 
 img_x, img_y = 512, 512
 parallel_augment = 9

@@ -6,12 +6,12 @@ from src.utils.config_loader import train_data
 from src.utils.config_loader import test_data
 from src.clearer.dataset_generators.dataset_generator_providers import clearer_dataset_pair_creater
 
-log_dir = '../models/clearer/logs/'
-batch_size = 3
+log_dir = 'models/clearer/logs/'
+batch_size = 4
 epochs = 50
 
 optimizer = {
-    "adam": 'adam',
+    "adam": tf.keras.optimizers.Adam(learning_rate=0.001),
     "sgd_nesterov": tf.keras.optimizers.SGD(
         learning_rate=0.01, momentum=0.01, nesterov=True, name="SGD"
     ),
@@ -33,11 +33,12 @@ def train_clearer_model(model):
 
     model.compile(loss='binary_crossentropy',
                   optimizer=optimizer["adam"],
-                  metrics=['accuracy'])
+                  metrics=['accuracy'],
+                  run_eagerly=True)
 
     train_dataset = clearer_dataset_pair_creater(train_data)
     test_dataset = clearer_dataset_pair_creater(test_data)
-
+    print("Data created")
     model.fit(train_dataset, batch_size=batch_size,
               epochs=epochs,
               callbacks=my_callbacks,

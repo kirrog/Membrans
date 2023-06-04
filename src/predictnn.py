@@ -27,7 +27,6 @@ def from_dcm_to_png(directory):
         image_2d = (np.maximum(image_2d, 0) / image_2d.max())
         image_2d = cv2.resize(image_2d, (img_x, img_y), interpolation=cv2.INTER_CUBIC)
         pred[iter, :, :] = image_2d
-        sys.stdout.write("\rImage %i loaded" % iter)
     print(pred.shape[0])
     return pred, dcm
 
@@ -38,12 +37,15 @@ img_y_orig = dcm.Rows
 results = model.predict(x=data, batch_size=batch_size)
 
 
-def from_dcm_to_png(directory, dcm, data, img_x_orig, img_y_orig):
+def from_dcm_to_png(directory, data, img_x_orig, img_y_orig):
+    print(data.shape)
     for iter in range(data.shape[0]):
         # '{:03}'.format(iter)
-        dcm.PixelData = cv2.resize(data[iter, :, :], (img_x_orig, img_y_orig), interpolation=cv2.INTER_CUBIC)
-        dicom.dcmwrite((directory + '{:04}'.format(iter) + '.dcm'), dcm, True)
+        data = cv2.resize(data[iter], (img_x_orig, img_y_orig), interpolation=cv2.INTER_CUBIC)
+        image_2d_scaled = (np.maximum(data, 0) / data.max()) * 255.0
+        image_2d_scaled = np.uint8(image_2d_scaled)
+        cv2.imwrite((directory + f'{iter:04}' + '.png'), image_2d_scaled)
         sys.stdout.write("\rImage %i written" % iter)
 
 
-from_dcm_to_png(output_data_dir, dcm, results, img_x_orig, img_y_orig)
+from_dcm_to_png(output_data_dir, results, img_x_orig, img_y_orig)

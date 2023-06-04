@@ -10,6 +10,9 @@ import numpy as np
 import pydicom as dicom
 from tqdm import tqdm
 
+from src.clearer.dataset_generators.dataset_generator_providers import clearer_dataset_pair_creater
+from src.utils.config_loader import train_data
+
 patient_path = '../patient_data'
 clearer_model_path = '../result_models/clearer_weights.h5'
 generator_model_path = '../result_models/generator_weights.h5'
@@ -53,19 +56,18 @@ def load_dicom_image(filepath2dicom: Path):
 def from_dcm_to_png(directory: Path):
     paths_predicts = sorted(directory.glob("*"))
     print(len(paths_predicts))
-    pred = np.zeros([len(paths_predicts), 512, 512])
-    dcm = 0
+    loaded_data = np.zeros([len(paths_predicts), 512, 512])
     for i, filepath2dicom in tqdm(enumerate(paths_predicts)):
         dcm = dicom.dcmread(filepath2dicom)
         image_2d_numpy = dcm.pixel_array.astype(float)
         image_2d_normalised = (np.maximum(image_2d_numpy, 0) / image_2d_numpy.max())
         image_2d_resized = cv2.resize(image_2d_normalised, (img_x, img_y), interpolation=cv2.INTER_CUBIC)
-        pred[i, :, :] = image_2d_resized
+        loaded_data[i, :, :] = image_2d_resized
     # with Pool() as p:
     #     for image_2d, i in tqdm(p.imap(load_dicom_image, paths_predicts)):
-    #         pred[i, :, :] = image_2d
-    print(pred.shape[0])
-    return pred, dcm
+    #         loaded_data[i, :, :] = image_2d
+    print(loaded_data.shape[0])
+    return loaded_data
 
 
 def load_patient(dir_path_str: str):
@@ -93,10 +95,10 @@ def load_patient(dir_path_str: str):
 
 
 if __name__ == "__main__":
-    args = parse_args()
-    input_directory = args.input_directory if args.input_directory is not None else "../dataset/inference_data_dir/001"
-    output_directory = args.output_directory if args.output_directory is not None else "../dataset/inference_results/001"
-    config = args.config
-    config_data = parse_config_file(config)
-    numpy_image, nums = load_patient(input_directory)
+    # args = parse_args()
+    # input_directory = args.input_directory if args.input_directory is not None else "../dataset/inference_data_dir/001"
+    # output_directory = args.output_directory if args.output_directory is not None else "../dataset/inference_results/001"
+    # config = args.config
+    # config_data = parse_config_file(config)
+    # numpy_image, nums = load_patient(input_directory)
     exit(0)
