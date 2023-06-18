@@ -17,9 +17,9 @@ img_x, img_y = 512, 512
 def parse_args():
     parser = argparse.ArgumentParser("Program arguments")
     parser.add_argument("--input_directory", help="Directory of dicom dir and txt", type=str,
-                        default="dataset/inference_data_dir/pvlv")
+                        default="dataset/inference_data_dir/vnkv")
     parser.add_argument("--output_directory", help="Directory of stl", type=str,
-                        default="dataset/inference_results/pvlv_1")
+                        default="dataset/inference_results/vnkv_2")
     return parser.parse_args()
 
 
