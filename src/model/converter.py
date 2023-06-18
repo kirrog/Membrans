@@ -94,7 +94,8 @@ class Converter:
         regions_border_without_bone = []
         for i, j, k in zip(coords[0], coords[1], coords[2]):
             slice_data = merge[i - 1:i + 2, j - 1:j + 2, k - 1:k + 2]
-            if slice_data.mean() != self.membran_code and len(slice_data[slice_data == self.bone_code]) == 0:
+            bone_slice_data = merge[i - 2:i + 3, j - 2:j + 3, k - 2:k + 3]
+            if slice_data.mean() != self.membran_code and len(bone_slice_data[bone_slice_data == self.bone_code]) == 0:
                 regions_border_without_bone.append((i, j, k))
         result_matrix = np.zeros(merge.shape)
         for i, j, k in regions_border_without_bone:
