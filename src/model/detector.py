@@ -22,21 +22,21 @@ data_path = "dataset/inference_numpy"
 class Detector:
     def __init__(self, model_path: Path, cstm_logger: CstmLogger):
         self.cstm_logger = cstm_logger
-        self.cstm_logger.log(f"Loading detector from: {model_path}")
+        self.cstm_logger.log(f"Загрузка модели детекции из: {model_path}")
         # self.model = keras.models.load_model(model_path)
-        self.cstm_logger.log("Detector model loaded")
+        self.cstm_logger.log("Загрузка модели завершена")
 
     def apply(self, tomography_datacube, segment_datacube, numbers_of_interest: List[int], batch_size: int):
-        self.cstm_logger.log(f"Start processing tomography with shape: {tomography_datacube.shape}")
-        self.cstm_logger.log(f"Start processing segment with shape: {segment_datacube.shape}")
+        self.cstm_logger.log(f"Начало обработки тамографии с формой массива: {tomography_datacube.shape}")
+        self.cstm_logger.log(f"Начало обработки сегментации с формой массива: {segment_datacube.shape}")
         num_str = ", ".join([str(x) for x in numbers_of_interest])
-        self.cstm_logger.log(f"Start processing with nums of interest: {num_str}")
-        self.cstm_logger.log(f"Start processing with batch size: {batch_size}")
+        self.cstm_logger.log(f"Начало обработки с числом точек фокуса: {num_str}")
+        self.cstm_logger.log(f"Начало обработки с размером пакета обработки: {batch_size}")
         # self.model.predict(x=(tomography_datacube, segment_datacube, numbers_of_interest), batch_size=batch_size)
         mean_value = tomography_datacube.mean()
         case_name = means_values[mean_value]
         dir_path = Path(data_path) / case_name
         segmented_datacube = np.load(str(dir_path / "bone.npy"))
         defect_datacube = np.load(str(dir_path / "membr.npy"))
-        self.cstm_logger.log(f"Complete detecting")
+        self.cstm_logger.log(f"Детекция выполнена")
         return segmented_datacube, defect_datacube

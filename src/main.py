@@ -15,19 +15,19 @@ img_x, img_y = 512, 512
 
 
 def parse_args():
-    parser = argparse.ArgumentParser("Program arguments")
-    parser.add_argument("--input_directory", help="Directory of dicom dir and txt", type=str,
+    parser = argparse.ArgumentParser("Аргументы программы")
+    parser.add_argument("--input_directory", help="Путь до директории с файлом .txt и директорией dicom серии", type=str,
                         default="dataset/inference_data_dir/vnkv")
-    parser.add_argument("--output_directory", help="Directory of stl", type=str,
-                        default="dataset/inference_results/vnkv_2")
+    parser.add_argument("--output_directory", help="Директория для сохранения результатов", type=str,
+                        default="dataset/inference_results/vnkv_3")
     return parser.parse_args()
 
 
 def main_pipeline(args, cstm_logger: CstmLogger):
     input_directory = args.input_directory
     output_directory = args.output_directory
-    cstm_logger.log(f"Input: {input_directory}")
-    cstm_logger.log(f"Output: {output_directory}")
+    cstm_logger.log(f"Директория исходников: {input_directory}")
+    cstm_logger.log(f"Директория результатов: {output_directory}")
     collector = Collector(cstm_logger)
     tomography_datacube, numbers_of_interest = collector.apply(input_directory)
     clearer = Clearer(clearer_model_path, cstm_logger)

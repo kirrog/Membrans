@@ -4,10 +4,10 @@ import numpy as np
 
 
 def parse_args():
-    parser = argparse.ArgumentParser("Program arguments")
-    parser.add_argument("--prediction_file", help="Filepath to predicted membran", type=str,
+    parser = argparse.ArgumentParser("Аргументы программы")
+    parser.add_argument("--prediction_file", help="Путь до файла массива предсказанной мембраны", type=str,
                         default="dataset/inference_results/vnkv/membran.npy")
-    parser.add_argument("--original_file", help="Filepath to original membran", type=str,
+    parser.add_argument("--original_file", help="Путь до файла массива оригинальной мембраны", type=str,
                         default="dataset/inference_results/vnkv_3/membran.npy")
     return parser.parse_args()
 
@@ -34,7 +34,8 @@ if __name__ == "__main__":
     predicted = np.load(args.prediction_file)
     original = np.load(args.original_file)
     if not compare_shape(original.shape, predicted.shape):
-        print(f"Wrong shapes of files: predicted shape: {predicted.shape} target shape: {original.shape}")
+        print(f"[Ошибка] Неверная форма массива в файлах: предсказанный массив: {predicted.shape} "
+              f"оригинальный массив: {original.shape}")
         exit(1)
     result = 1 - (np.sum(np.abs(original - predicted)) / shape_size(original.shape))
-    print(f"Coefficient Sørensen–Dice: {result:0.9f}")
+    print(f"Точность: {result:0.9f}")

@@ -8,9 +8,9 @@ class StlConverter:
         self.cstm_logger = cstm_logger
 
     def apply(self, defect_datacube):
-        self.cstm_logger.log("Create voxel model")
+        self.cstm_logger.log("Создание воксельной модели")
         voxel_model = vf.VoxelModel(defect_datacube, 1)
-        self.cstm_logger.log("Start conversion to stl")
+        self.cstm_logger.log("Начало конвертации в полигоны")
         result = vf.Mesh.fromVoxelModel(voxel_model, (0.0, 1.0, 0.0, 1.0))
-        self.cstm_logger.log("Conversion complete")
+        self.cstm_logger.log("Конвертация выполнена")
         return result

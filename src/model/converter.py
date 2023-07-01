@@ -31,9 +31,9 @@ class Converter:
 
     def __init__(self, model_path: Path, cstm_logger: CstmLogger):
         self.cstm_logger = cstm_logger
-        self.cstm_logger.log(f"Loading converter from: {model_path}")
+        self.cstm_logger.log(f"Загрузка модели преобразователя из: {model_path}")
         # self.model = keras.models.load_model(model_path)
-        self.cstm_logger.log("Converter model loaded")
+        self.cstm_logger.log("Преобразователь загружен")
 
     def threshold_voxels_by_cohesion_number(self, data: np.array,
                                             component_elements_threshold: int = 100,
@@ -86,9 +86,9 @@ class Converter:
         return result_data
 
     def apply(self, segmented_datacube, defect_datacube, batch_size):
-        self.cstm_logger.log(f"Start processing segment with shape: {segmented_datacube.shape}")
-        self.cstm_logger.log(f"Start processing defect with shape: {defect_datacube.shape}")
-        self.cstm_logger.log(f"Start processing with batch size: {batch_size}")
+        self.cstm_logger.log(f"Начало обработки сегмента формы массива: {segmented_datacube.shape}")
+        self.cstm_logger.log(f"Начало обработки дефекта формы массива: {defect_datacube.shape}")
+        self.cstm_logger.log(f"Начало обработки с размером обрабатываемого пакета: {batch_size}")
         merge = defect_datacube * self.membran_code + segmented_datacube * self.bone_code
         coords = np.where(merge == self.membran_code)
         regions_border_without_bone = []
@@ -101,5 +101,5 @@ class Converter:
         for i, j, k in regions_border_without_bone:
             result_matrix[i, j, k] = 1
         thresholded_matrix = self.threshold_voxels_by_cohesion_number(result_matrix)
-        self.cstm_logger.log(f"Complete converting membran")
+        self.cstm_logger.log(f"Преобразование мембраны завершено")
         return thresholded_matrix

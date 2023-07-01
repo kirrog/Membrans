@@ -21,10 +21,10 @@ class Saver:
         membran_res_path = output_directory / self.membran_template
         stl_res_path = output_directory / self.stl_template
         np.save(str(segmentation_res_path), segmented_datacube)
-        self.cstm_logger.log(f"Segmentation results saved at: {segmentation_res_path}")
+        self.cstm_logger.log(f"Результаты сегментации сохранены в: {segmentation_res_path}")
         np.save(str(defect_res_path), defect_datacube)
-        self.cstm_logger.log(f"Defect results saved at: {defect_res_path}")
+        self.cstm_logger.log(f"Дефект сохранен в: {defect_res_path}")
         np.save(str(membran_res_path), membran_datacube)
-        self.cstm_logger.log(f"Membran results saved at: {membran_res_path}")
+        self.cstm_logger.log(f"Мембрана сохранена в: {membran_res_path}")
         stl_surface.export(str(stl_res_path))
-        self.cstm_logger.log(f"Stl results saved at: {stl_res_path}")
+        self.cstm_logger.log(f"Полигоны сохранены в: {stl_res_path}")
